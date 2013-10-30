@@ -1,4 +1,6 @@
-.ipr
-.iws
-.iml
-.log
+*~
+*.ipr
+*.iws
+*.iml
+*.log
+target/
