@@ -4,7 +4,11 @@ package com.francetelecom.dome.util;
  * User: eduard.cojocaru
  * Date: 10/29/13
  */
-public class Constants {
+public final class Constants {
+
+    private Constants() {
+    }
+
     public static final String NUMBER_OF_MESSAGES_IN_BATCH = "500";
 
     public static final String TOPICS = "topics";
