@@ -3,6 +3,7 @@ package com.francetelecom.dome;
 import com.francetelecom.dome.beans.Configuration;
 import com.francetelecom.dome.beans.Profile;
 import com.francetelecom.dome.beans.Topic;
+import com.francetelecom.dome.configuration.Configurable;
 import com.francetelecom.dome.exception.BadConfigurationException;
 import com.francetelecom.dome.util.Constants;
 import org.slf4j.Logger;
@@ -10,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 
 /**
  * User: eduard.cojocaru Date: 10/29/13
@@ -22,10 +22,10 @@ public class ConfigInitializer {
     public static final String EMPTY = "";
     public static final String COMMA = ",";
 
-    private ResourceBundle resourceBundle;
+    private Configurable configurable;
 
-    public ConfigInitializer() {
-        this.resourceBundle = ResourceBundle.getBundle(Constants.CONFIGURATION_FILE_BASE_NAME);
+    public ConfigInitializer(Configurable configurable) {
+        this.configurable = configurable;
     }
 
     public Configuration getConfiguration() {
@@ -34,7 +34,7 @@ public class ConfigInitializer {
 
         try {
 
-            final int liveCapacity = Integer.parseInt(resourceBundle.getString(Constants.THREADS_NUMBER));
+            final int liveCapacity = configurable.getIntProperty(Constants.THREADS_NUMBER);
             configuration = new Configuration(getProfiles(liveCapacity), liveCapacity);
 
         } catch (Exception ex) {
@@ -49,7 +49,7 @@ public class ConfigInitializer {
 
         final List<Profile> profiles = new ArrayList<>();
 
-        String commaSeparatedTopics = resourceBundle.getString(Constants.TOPICS);
+        String commaSeparatedTopics = configurable.getStringProperty(Constants.TOPICS);
         LOGGER.info("Removing spaces from topics.");
         commaSeparatedTopics = commaSeparatedTopics.replaceAll(SPACE, EMPTY);
 
@@ -69,9 +69,9 @@ public class ConfigInitializer {
 
     private Profile getProfile(String topic) {
 
-        final String portValue = resourceBundle.getString(topic + Constants.PORT_SUFFIX);
-        final String accepted = resourceBundle.getString(topic + Constants.ACCEPT_SUFFIX);
-        final String brokers = resourceBundle.getString(topic + Constants.BROKERS_SUFFIX);
+        final String portValue = configurable.getStringProperty(topic + Constants.PORT_SUFFIX);
+        final String accepted = configurable.getStringProperty(topic + Constants.ACCEPT_SUFFIX);
+        final String brokers = configurable.getStringProperty(topic + Constants.BROKERS_SUFFIX);
 
         List<Topic> topics = new ArrayList<>();
         topics.add(new Topic(topic, brokers));

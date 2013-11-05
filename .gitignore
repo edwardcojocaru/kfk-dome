@@ -3,4 +3,5 @@
 *.iws
 *.iml
 *.log
+*.log.*
 target/

@@ -24,7 +24,7 @@ import java.util.concurrent.Callable;
  */
 public class DomeProducer implements Callable<String> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleProducer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DomeProducer.class);
 
     private final ProducerType producerType = ProducerType.ASYNC;
 
@@ -67,6 +67,7 @@ public class DomeProducer implements Callable<String> {
     @Override
     public String call() throws IOException {
 
+        LOGGER.info("Starting data injection to kafka...");
         // TODO check if the IOException should be handled in thread and not outside
         final long initialTime = System.nanoTime();
 
