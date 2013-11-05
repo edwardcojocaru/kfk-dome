@@ -10,11 +10,19 @@ public class Topic {
 
     private String name;
 
+    private String filePrefix;
+
     private Acknowledge acknowledge = Acknowledge.LEADER_ACK;
 
     public Topic(String name, String brokerList) {
         this.brokerList = brokerList;
         this.name = name;
+    }
+
+    public Topic(String name, String brokerList, String filePrefix) {
+        this.brokerList = brokerList;
+        this.name = name;
+        this.filePrefix = filePrefix;
     }
 
     public String getBrokerList() {
@@ -27,6 +35,10 @@ public class Topic {
 
     public String getAcknowledge() {
         return acknowledge.getValue();
+    }
+
+    public String getFilePrefix() {
+        return filePrefix;
     }
 
     @Override

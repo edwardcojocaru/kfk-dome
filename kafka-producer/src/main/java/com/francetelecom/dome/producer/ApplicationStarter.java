@@ -7,6 +7,7 @@ import com.francetelecom.dome.configuration.BundleConfiguration;
 import com.francetelecom.dome.configuration.Configurable;
 import com.francetelecom.dome.configuration.StreamConfiguration;
 import com.francetelecom.dome.producer.remote.PortListener;
+import com.francetelecom.dome.producer.watcher.DirectoryWatcherManager;
 import com.francetelecom.dome.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,9 @@ public class ApplicationStarter {
 
         applicationStarter.start(configurationPath);
         LOGGER.info("Application started.");
+
+        DirectoryWatcherManager watcher = new DirectoryWatcherManager();
+        watcher.watch(applicationStarter.configuration.getWatchedDirectory());
     }
 
     private void start(String configurationPath) throws IOException {

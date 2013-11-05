@@ -15,9 +15,16 @@ public class Configuration {
 
     private int liveCapacity;
 
+    private String watchedDirectory;
+
     public Configuration(List<Profile> profiles, int liveCapacity) {
+        this(profiles, liveCapacity, null);
+    }
+
+    public Configuration(List<Profile> profiles, int liveCapacity, String watchedDirectory) {
         this.profiles = profiles;
         this.liveCapacity = liveCapacity;
+        this.watchedDirectory = watchedDirectory;
 
         if (profiles == null || profiles.isEmpty() || liveCapacity == 0) {
             throw new BadConfigurationException();
@@ -34,5 +41,9 @@ public class Configuration {
 
     public int getListenerCapacity() {
         return profiles.size();
+    }
+
+    public String getWatchedDirectory() {
+        return watchedDirectory;
     }
 }
