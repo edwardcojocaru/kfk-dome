@@ -3,6 +3,7 @@ package com.francetelecom.dome;
 import com.francetelecom.dome.beans.Configuration;
 import com.francetelecom.dome.beans.Profile;
 import com.francetelecom.dome.beans.Topic;
+import com.francetelecom.dome.configuration.ConfigurableFactory;
 import org.junit.Test;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class ConfigInitializerTest {
     @Test
     public void testGetConfiguration() throws Exception {
 
-        final ConfigInitializer configInitializer = new ConfigInitializer();
+        final ConfigInitializer configInitializer = new ConfigInitializer(ConfigurableFactory.getConfigurable(null));
 
         final Configuration configuration = configInitializer.getConfiguration();
 
@@ -32,7 +33,7 @@ public class ConfigInitializerTest {
         assertTrue(topics.size() > 0);
 
         final Topic topic = topics.get(0);
-        assertEquals("my-replicated-topic", topic.getName());
-        assertEquals("172.16.198.148:9092,172.16.198.148:9093", topic.getBrokerList());
+        assertEquals("real-topic-5p2r", topic.getName());
+        assertEquals("172.16.198.179:9092,172.16.198.179:9093", topic.getBrokerList());
     }
 }

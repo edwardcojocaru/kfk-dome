@@ -1,7 +1,10 @@
 package com.francetelecom.dome.producer.watcher;
 
+import com.francetelecom.dome.beans.Configuration;
 import com.francetelecom.dome.beans.Topic;
 import com.francetelecom.dome.producer.DomeProducer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -12,30 +15,29 @@ import java.util.zip.GZIPInputStream;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
-/**
- * Created with IntelliJ IDEA.
- * User: ecojocaru
- * Date: 11/5/13
- * Time: 11:11 PM
- * To change this template use File | Settings | File Templates.
- */
 public class DirectoryWatcher implements Callable<String> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryWatcher.class);
+    public static final String GZIP_FILE = "application/x-gzip";
+
     private final ExecutorService executor;
+    private Configuration configuration;
 
     private final WatchService watcher;
     private final Path watchedDirectory;
 
     private boolean watching = true;
 
-    public DirectoryWatcher(String path, ExecutorService executor) throws IOException {
+    public DirectoryWatcher(String path, ExecutorService executor, Configuration configuration) throws IOException {
         this.executor = executor;
+        this.configuration = configuration;
         this.watcher = FileSystems.getDefault().newWatchService();
 
 
         watchedDirectory = Paths.get(path);
 
         watchedDirectory.register(watcher, ENTRY_CREATE);
+        LOGGER.info("Directory registered to watch: " + watchedDirectory);
     }
 
 
@@ -64,19 +66,19 @@ public class DirectoryWatcher implements Callable<String> {
                 Path child;
                 try {
                     child = watchedDirectory.resolve(filename);
-                    // TODO check type gz
-                    if (!Files.probeContentType(child).equals("text/plain")) {
-                        System.err.format("Unsupported file type. File name %s.", filename);
+                    if (!Files.probeContentType(child).equals(GZIP_FILE)) {
+                        LOGGER.warn(String.format("Unsupported file type. File name %s.", filename));
                         continue;
                     }
                 } catch (IOException x) {
-                    System.err.println(x);
+                    LOGGER.error("Error reading file.", x);
                     continue;
                 }
 
-                // TODO launch gzip producer
-                //TODO add topic factory
-                executor.submit(new DomeProducer(new Topic("a", "b"), new GZIPInputStream(Files.newInputStream(child))));
+                final Topic topic = configuration.getTopic(child.getFileName().toString());
+                if (topic != null) {
+                    executor.submit(new DomeProducer(topic, new GZIPInputStream(Files.newInputStream(child))));
+                }
 
             }
 

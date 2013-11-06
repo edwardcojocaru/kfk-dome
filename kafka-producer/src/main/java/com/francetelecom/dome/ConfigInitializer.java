@@ -35,7 +35,8 @@ public class ConfigInitializer {
         try {
 
             final int liveCapacity = configurable.getIntProperty(Constants.THREADS_NUMBER);
-            configuration = new Configuration(getProfiles(liveCapacity), liveCapacity);
+            final String watchedDirectory = configurable.getStringProperty(Constants.WATCHED_DIRECTORY);
+            configuration = new Configuration(getProfiles(liveCapacity), liveCapacity, watchedDirectory);
 
         } catch (Exception ex) {
             LOGGER.error("The configuration file might be wrong.", ex);

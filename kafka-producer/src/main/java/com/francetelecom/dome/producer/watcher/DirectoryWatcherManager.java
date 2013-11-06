@@ -1,8 +1,8 @@
 package com.francetelecom.dome.producer.watcher;
 
+import com.francetelecom.dome.beans.Configuration;
+
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.WatchService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -20,20 +20,19 @@ public class DirectoryWatcherManager {
     private final ExecutorService executor;
     private final ExecutorService workerExecutor;
 
-    private final WatchService watcher;
+    private Configuration configuration;
 
-
-    public DirectoryWatcherManager() throws IOException {
+    public DirectoryWatcherManager(Configuration configuration) throws IOException {
+        this.configuration = configuration;
         this.executor = Executors.newFixedThreadPool(WATCHED_DIRECTORIES_COUNT);
         this.workerExecutor = Executors.newFixedThreadPool(WATCHED_DIRECTORIES_COUNT);
-        this.watcher = FileSystems.getDefault().newWatchService();
-
     }
 
-    public void watch(String watchedDirectoryPath) throws IOException {
+    public void watch() throws IOException {
 
-
-        executor.submit(new DirectoryWatcher(watchedDirectoryPath, workerExecutor));
+        if (configuration.hasDirectoryToWatch()) {
+            executor.submit(new DirectoryWatcher(configuration.getWatchedDirectory(), workerExecutor, configuration));
+        }
     }
 
     // TODO add method for a list of directories

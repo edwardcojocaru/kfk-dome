@@ -49,4 +49,8 @@ public class Topic {
                 ", acknowledge=" + acknowledge +
                 '}';
     }
+
+    public boolean isValidFilename(String fileName) {
+        return fileName != null && filePrefix != null && fileName.contains(filePrefix);
+    }
 }

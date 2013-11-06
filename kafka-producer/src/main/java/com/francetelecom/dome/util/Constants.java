@@ -6,6 +6,8 @@ package com.francetelecom.dome.util;
  */
 public final class Constants {
 
+    public static final String WATCHED_DIRECTORY = "watched.directory";
+
     private Constants() {
     }
 
