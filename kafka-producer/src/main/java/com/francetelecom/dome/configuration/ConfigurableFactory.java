@@ -18,6 +18,7 @@ public final class ConfigurableFactory {
     public static Configurable getConfigurable(String configurationPath) throws IOException {
         if (configurationPath != null) {
             return new StreamConfiguration(new FileInputStream(configurationPath));
+//            return new StreamConfiguration(Files.newInputStream(Paths.get(configurationPath), new OpenOption[]{StandardOpenOption.READ}));
         } else {
             return new BundleConfiguration(ResourceBundle.getBundle(Constants.CONFIGURATION_FILE_BASE_NAME));
         }
