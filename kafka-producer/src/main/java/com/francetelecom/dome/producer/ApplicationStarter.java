@@ -84,6 +84,10 @@ public class ApplicationStarter {
     public void stopProducing() {
         LOGGER.info("Stopping producer application...");
 
+        for (PortListener listener : this.listeners.values()) {
+            listener.close();
+        }
+
         boolean isExecutorTerminated = Utils.waitToStopExecutorManager(this.topicRunner);
 
         if (!isExecutorTerminated) {

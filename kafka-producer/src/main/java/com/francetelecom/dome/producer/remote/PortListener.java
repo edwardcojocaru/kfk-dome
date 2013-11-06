@@ -14,6 +14,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * User: eduard.cojocaru
@@ -26,7 +27,9 @@ public class PortListener implements Callable<String> {
 
     private final Profile profile;
 
-    private boolean listening = true;
+    private AtomicBoolean listening = new AtomicBoolean(Boolean.TRUE);
+
+    private ServerSocket serverSocket;
 
     public PortListener(Profile profile, ProducerRunner executor) {
         this.profile = profile;
@@ -48,15 +51,17 @@ public class PortListener implements Callable<String> {
 
         final int listeningPort = profile.getListeningPort();
         try (ServerSocket serverSocket = new ServerSocket(listeningPort, 50, byName)) {
+            this.serverSocket = serverSocket;
+
             LOGGER.info("Listening on port: " + listeningPort);
-            while (listening) {
+            while (listening.get()) {
 
                 final Socket clientSocket;
                 try {
                     clientSocket = serverSocket.accept();
                 } catch (IOException e) {
                     if (Thread.currentThread().isInterrupted()) {
-                        listening = false;
+                        listening.set(Boolean.FALSE);
                     }
                     LOGGER.warn("Client may be disconnected. Skipping connection.");
                     continue;
@@ -91,7 +96,14 @@ public class PortListener implements Callable<String> {
         return new DomeProducer(profile.getTopics().get(0), inputStream);
     }
 
-    public void setListening(boolean listening) {
-        this.listening = listening;
+    public void close() {
+        try {
+            if (serverSocket != null) {
+                serverSocket.close();
+            }
+            listening.set(Boolean.FALSE);
+        } catch (IOException e) {
+            LOGGER.warn("Socket may be already closed.");
+        }
     }
 }
