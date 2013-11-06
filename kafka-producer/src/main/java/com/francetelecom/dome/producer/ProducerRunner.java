@@ -1,6 +1,7 @@
 package com.francetelecom.dome.producer;
 
 
+import com.francetelecom.dome.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,13 +26,8 @@ public class ProducerRunner {
         return executor.submit(producer);
     }
 
-    public void awaitProducerTermination() {
-        try {
-            executor.awaitTermination(1, TimeUnit.HOURS);
-        } catch (InterruptedException e) {
-            // TODO handle it
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+    public void initializeProducerTermination() {
+        Utils.waitToStopExecutorWorker(executor);
     }
 
 }

@@ -11,11 +11,16 @@ import java.nio.file.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.GZIPInputStream;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
+/**
+ * User: eduard.cojocaru
+ * Date: 10/30/13
+ */
 public class DirectoryWatcher implements Callable<String> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryWatcher.class);
@@ -27,7 +32,7 @@ public class DirectoryWatcher implements Callable<String> {
     private final WatchService watcher;
     private final Path watchedDirectory;
 
-    private boolean watching = true;
+    private AtomicBoolean watching = new AtomicBoolean(Boolean.TRUE);
 
     public DirectoryWatcher(String path, ExecutorService executor, Configuration configuration) throws IOException {
         this.executor = executor;
@@ -36,6 +41,9 @@ public class DirectoryWatcher implements Callable<String> {
 
 
         watchedDirectory = Paths.get(path);
+        if (Files.notExists(watchedDirectory)) {
+            Files.createDirectories(watchedDirectory);
+        }
 
         watchedDirectory.register(watcher, ENTRY_CREATE);
         LOGGER.info("Directory registered to watch: " + watchedDirectory);
@@ -45,7 +53,7 @@ public class DirectoryWatcher implements Callable<String> {
     @Override
     public String call() throws Exception {
 
-        while (watching) {
+        while (watching.get()) {
 
             WatchKey key;
             try {
@@ -105,5 +113,7 @@ public class DirectoryWatcher implements Callable<String> {
         return (WatchEvent<T>)event;
     }
 
-    // TODO add interruption method
+    public void stopWatching() {
+        this.watching.set(Boolean.FALSE);
+    }
 }

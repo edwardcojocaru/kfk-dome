@@ -1,6 +1,7 @@
 package com.francetelecom.dome.producer.remote;
 
 import com.francetelecom.dome.beans.Profile;
+import com.francetelecom.dome.exception.ServerSocketCreationException;
 import com.francetelecom.dome.producer.DomeProducer;
 import com.francetelecom.dome.producer.ProducerRunner;
 import org.slf4j.Logger;
@@ -11,13 +12,14 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.concurrent.Callable;
 
 /**
  * User: eduard.cojocaru
  * Date: 10/29/13
  */
-public class PortListener implements Callable {
+public class PortListener implements Callable<String> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PortListener.class);
     private final ProducerRunner runner;
@@ -31,12 +33,35 @@ public class PortListener implements Callable {
         this.runner = executor;
     }
 
-    public Object call() {
+    public String call() throws ServerSocketCreationException {
 
-        try (ServerSocket serverSocket = new ServerSocket(profile.getListeningPort())) {
-            LOGGER.info("Listening on port: " + profile.getListeningPort());
+        InetAddress byName = null;
+        try {
+            byName = InetAddress.getByName(profile.getListeningAddress());
+        } catch (UnknownHostException e) {
+            try {
+                byName = InetAddress.getLocalHost();
+            } catch (UnknownHostException e1) {
+                LOGGER.error("No address found and localhost not defined.");
+            }
+        }
+
+        final int listeningPort = profile.getListeningPort();
+        try (ServerSocket serverSocket = new ServerSocket(listeningPort, 50, byName)) {
+            LOGGER.info("Listening on port: " + listeningPort);
             while (listening) {
-                final Socket clientSocket = serverSocket.accept();
+
+                final Socket clientSocket;
+                try {
+                    clientSocket = serverSocket.accept();
+                } catch (IOException e) {
+                    if (Thread.currentThread().isInterrupted()) {
+                        listening = false;
+                    }
+                    LOGGER.warn("Client may be disconnected. Skipping connection.");
+                    continue;
+                }
+
                 final InetAddress inetAddress = clientSocket.getInetAddress();
 
                 final boolean isAcceptedListEmpty = !profile.hasAcceptedHosts();
@@ -48,10 +73,11 @@ public class PortListener implements Callable {
             }
 
         } catch (IOException e) {
-            runner.awaitProducerTermination();
+            LOGGER.error("IOException raised d.", e);
+            throw new ServerSocketCreationException(profile, e);
         }
 
-        return null;
+        return "ConnectionDoneForPort-" + listeningPort;
     }
 
     private boolean isHostInAcceptedList(InetAddress inetAddress) {

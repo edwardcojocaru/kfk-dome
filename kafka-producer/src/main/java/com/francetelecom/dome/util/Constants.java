@@ -1,5 +1,7 @@
 package com.francetelecom.dome.util;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * User: eduard.cojocaru
  * Date: 10/29/13
@@ -7,6 +9,8 @@ package com.francetelecom.dome.util;
 public final class Constants {
 
     public static final String WATCHED_DIRECTORY = "watched.directory";
+    public static final int MANAGERS_TIMEOUT = 10;
+    public static final TimeUnit MANAGERS_TIMEOUT_UNITS = TimeUnit.SECONDS;
 
     private Constants() {
     }
@@ -16,7 +20,9 @@ public final class Constants {
     public static final String TOPICS = "topics";
 
     public static final String PORT_SUFFIX = ".port";
+
     public static final String ACCEPT_SUFFIX = ".accept";
+    public static final String ADDRESS_SUFFIX = ".address";
     public static final String BROKERS_SUFFIX = ".brokers";
     public static final String TOPIC_FILE_PREFIX = ".filePrefix";
 

@@ -62,7 +62,7 @@ public class ProducerRunnerTest {
 
         final ProducerRunner producerRunner = getProducerRunner();
 
-        producerRunner.awaitProducerTermination();
+        producerRunner.initializeProducerTermination();
 
         verify(executor).awaitTermination(1, TimeUnit.HOURS);
 
@@ -76,7 +76,7 @@ public class ProducerRunnerTest {
         return producerRunner;
     }
 
-    //    public void awaitProducerTermination() {
+    //    public void initializeProducerTermination() {
 //        try {
 //            executor.awaitTermination(1, TimeUnit.HOURS);
 //        } catch (InterruptedException e) {

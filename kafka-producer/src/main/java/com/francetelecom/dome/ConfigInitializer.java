@@ -72,6 +72,7 @@ public class ConfigInitializer {
 
         final String portValue = configurable.getStringProperty(topic + Constants.PORT_SUFFIX);
         final String accepted = configurable.getStringProperty(topic + Constants.ACCEPT_SUFFIX);
+        final String address = configurable.getStringProperty(topic + Constants.ADDRESS_SUFFIX);
         final String brokers = configurable.getStringProperty(topic + Constants.BROKERS_SUFFIX);
         final String filePrefix = configurable.getStringProperty(topic + Constants.TOPIC_FILE_PREFIX);
 
@@ -79,6 +80,6 @@ public class ConfigInitializer {
         List<Topic> topics = new ArrayList<>();
         topics.add(new Topic(topic, brokers, filePrefix));
 
-        return new Profile(Integer.parseInt(portValue), accepted, topics);
+        return new Profile(Integer.parseInt(portValue), address, accepted, topics);
     }
 }

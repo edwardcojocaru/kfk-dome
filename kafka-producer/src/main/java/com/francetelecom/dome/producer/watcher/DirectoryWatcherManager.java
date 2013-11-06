@@ -1,20 +1,21 @@
 package com.francetelecom.dome.producer.watcher;
 
 import com.francetelecom.dome.beans.Configuration;
+import com.francetelecom.dome.util.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Created with IntelliJ IDEA.
- * User: ecojocaru
- * Date: 11/5/13
- * Time: 11:01 PM
- * To change this template use File | Settings | File Templates.
+ * User: eduard.cojocaru
+ * Date: 10/30/13
  */
 public class DirectoryWatcherManager {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryWatcherManager.class);
 
     public static final int WATCHED_DIRECTORIES_COUNT = 10;
     private final ExecutorService executor;
@@ -29,11 +30,15 @@ public class DirectoryWatcherManager {
     }
 
     public void watch() throws IOException {
-
+        LOGGER.debug("Watch directories...");
         if (configuration.hasDirectoryToWatch()) {
             executor.submit(new DirectoryWatcher(configuration.getWatchedDirectory(), workerExecutor, configuration));
         }
     }
 
-    // TODO add method for a list of directories
+    public void stopWatching() {
+        Utils.waitToStopExecutorWorker(workerExecutor);
+        Utils.waitToStopExecutorManager(executor);
+    }
+
 }

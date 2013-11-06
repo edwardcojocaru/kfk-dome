@@ -11,18 +11,24 @@ public class Profile {
 
     private int listeningPort;
 
+    private String listeningAddress;
     private String acceptedHosts = "";
 
     private List<Topic> topics;
 
-    public Profile(int listeningPort, String acceptedHosts, List<Topic> topics) {
+    public Profile(int listeningPort, String ipAddress, String acceptedHosts, List<Topic> topics) {
         this.listeningPort = listeningPort;
+        this.listeningAddress = ipAddress;
         this.acceptedHosts = acceptedHosts;
         this.topics = topics;
     }
 
     public int getListeningPort() {
         return listeningPort;
+    }
+
+    public String getListeningAddress() {
+        return listeningAddress;
     }
 
     public String getAcceptedHosts() {
