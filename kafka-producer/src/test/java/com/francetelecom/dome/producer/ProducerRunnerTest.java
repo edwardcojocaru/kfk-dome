@@ -64,8 +64,7 @@ public class ProducerRunnerTest {
 
         producerRunner.initializeProducerTermination();
 
-        verify(executor).awaitTermination(1, TimeUnit.HOURS);
-
+        verify(executor).awaitTermination(10, TimeUnit.MINUTES);
     }
 
     private ProducerRunner getProducerRunner() {

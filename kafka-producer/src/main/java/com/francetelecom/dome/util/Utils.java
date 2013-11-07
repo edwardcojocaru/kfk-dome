@@ -22,13 +22,13 @@ public class Utils {
         return Utils.waitToStopExecutor(10, TimeUnit.MINUTES, executorService);
     }
 
-    public static boolean waitToStopExecutor(int timeout, TimeUnit minutes, ExecutorService workerExecutor1) {
+    public static boolean waitToStopExecutor(int timeout, TimeUnit timeUnit, ExecutorService workerExecutor1) {
 
         boolean isExecutorTerminated = false;
 
         workerExecutor1.shutdown();
         try {
-            isExecutorTerminated = workerExecutor1.awaitTermination(timeout, minutes);
+            isExecutorTerminated = workerExecutor1.awaitTermination(timeout, timeUnit);
         } catch (InterruptedException e) {
             LOGGER.info("Executor interrupted.");
         }
