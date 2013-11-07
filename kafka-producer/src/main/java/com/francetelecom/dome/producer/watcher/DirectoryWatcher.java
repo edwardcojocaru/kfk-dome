@@ -77,8 +77,9 @@ public class DirectoryWatcher implements Callable<String> {
                     child = watchedDirectory.resolve(filename);
                     LOGGER.info("Start processing file: {}.", child);
                     final String fileType = Files.probeContentType(child);
-
-                    if (!fileType.equals(GZIP_FILE)) {
+                    final String fileName = child.getFileName().toString();
+                    // TODO fix fileType for linux
+                    if (!(fileType.equals(GZIP_FILE) || fileName.endsWith(".gz"))) {
                         LOGGER.warn("Unsupported file type. File name {}. File type: {}", child, fileType);
                         continue;
                     }

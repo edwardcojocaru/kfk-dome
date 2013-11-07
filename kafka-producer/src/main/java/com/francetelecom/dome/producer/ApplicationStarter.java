@@ -61,7 +61,7 @@ public class ApplicationStarter {
         }
 
         directoryWatcherManager = new DirectoryWatcherManager(this.configuration, this.producerRunner);
-        directoryWatcherManager.watch();
+//        directoryWatcherManager.watch();
 
         new ApplicationManagement(this, configuration).start();
 
