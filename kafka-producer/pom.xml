@@ -22,7 +22,7 @@
 
     <profiles>
         <profile>
-            <id>shade</id>
+            <id>shadeProducer</id>
             <build>
                 <plugins>
                     <plugin>

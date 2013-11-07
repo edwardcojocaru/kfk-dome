@@ -1,5 +1,6 @@
 package com.francetelecom.dome.consumer;
 
+import com.francetelecom.dome.consumer.configuration.Configurable;
 import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import kafka.javaapi.consumer.ConsumerConnector;
@@ -18,7 +19,6 @@ public class ConsumerConnectorManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConsumerConnectorManager.class);
 
-
     private final Map<String, ConsumerConnector> connectorsMap = new HashMap<>();
 
     private ConsumerConnectorManager() {
@@ -32,11 +32,11 @@ public class ConsumerConnectorManager {
         return ConnectorHolder.CONSUMER_CONNECTOR;
     }
 
-    public ConsumerConnector getConnector(String group) {
+    public ConsumerConnector getConnector(Configurable configurable, String group) {
 
         if (!connectorsMap.containsKey(group)) {
             LOGGER.info("Create consumer");
-            connectorsMap.put(group, Consumer.createJavaConsumerConnector(createConsumerConfig(group)));
+            connectorsMap.put(group, Consumer.createJavaConsumerConnector(createConsumerConfig(group, configurable.getPropertiesAsMap())));
         }
 
         return connectorsMap.get(group);
@@ -50,14 +50,6 @@ public class ConsumerConnectorManager {
         }
 
         return connectorsMap.get(group);
-    }
-
-    private ConsumerConfig createConsumerConfig(String group) {
-
-        final Properties properties = KafkaConfigManager.INSTANCE.getConfiguration();
-        properties.put("group.id", group);
-
-        return new ConsumerConfig(properties);
     }
 
     private ConsumerConfig createConsumerConfig(String group, Map<String, Object> config) {

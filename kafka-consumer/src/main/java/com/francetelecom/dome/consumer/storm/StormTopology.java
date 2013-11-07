@@ -2,7 +2,9 @@ package com.francetelecom.dome.consumer.storm;
 
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
-import com.francetelecom.dome.consumer.KafkaConfigManager;
+import com.francetelecom.dome.consumer.configuration.Configurable;
+import com.francetelecom.dome.consumer.configuration.ConfigurableFactory;
+import com.francetelecom.dome.consumer.utils.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,21 +15,44 @@ import java.util.Map;
  */
 public class StormTopology {
 
+    private static final String KAFKA_SPOUT_PREFIX = "kafkaSpout-";
+    private static final String BOLT_PREFIX = "SimpleBolt-";
+    private static final String SPOUT_PARALLELISM = ".spoutParallelism";
+
     public static void main(String[] args) throws Exception {
+
+        String configurationPath = null;
+        if (args != null && args.length == 1) {
+            configurationPath = args[0];
+            // TODO in other cases it may throw an exception
+        }
+        Configurable configurable = ConfigurableFactory.getConfigurable(configurationPath);
 
         final TopologyBuilder builder = new TopologyBuilder();
 
-        builder.setSpout("kafkaSpout", new KafkaSpout("real-topic-2p1r"), 3);
-        builder.setBolt("SimpleBolt", new SimpleBolt()).shuffleGrouping("kafkaSpout");
+        final String topics = configurable.getStringProperty(Constants.TOPICS, "");
+        if (topics.isEmpty()) {
+            System.err.println("'topics' property not specified.");
+            return;
+        }
 
-        final Map<String, Object> stormConf = new HashMap<>();
+        for (String topic : topics.split(",")) {
+            final String spoutId = KAFKA_SPOUT_PREFIX + topic;
+            final String boltId = BOLT_PREFIX + topic;
+            final int parallelismHint = configurable.getIntProperty(topic + SPOUT_PARALLELISM, Constants.SPOUT_PARALLELISM_DEFAULT_VALUE);
 
-        KafkaConfigManager.INSTANCE.init(StormTopology.class.getClassLoader().getResourceAsStream("consumer.properties"));
-
-        stormConf.put("KafkaConfig", KafkaConfigManager.INSTANCE.getConfigurationAsMap());
+            builder.setSpout(spoutId, new KafkaSpout(topic), parallelismHint);
+            builder.setBolt(boltId, new SimpleBolt()).shuffleGrouping(spoutId);
+        }
 
         LocalCluster cluster = new LocalCluster();
-        cluster.submitTopology("kafkaConsumer", stormConf, builder.createTopology());
+        cluster.submitTopology("kafkaConsumer", getStormConfiguration(configurable), builder.createTopology());
+    }
+
+    private static Map<String, Object> getStormConfiguration(Configurable configurable) {
+        final Map<String, Object> stormConf = new HashMap<>();
+        stormConf.put(Constants.KAFKA_CONFIG_KEY, configurable.getPropertiesAsMap());
+        return stormConf;
     }
 
 

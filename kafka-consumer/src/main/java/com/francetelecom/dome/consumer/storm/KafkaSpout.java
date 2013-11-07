@@ -7,6 +7,7 @@ import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import com.francetelecom.dome.consumer.ConsumerConnectorManager;
+import com.francetelecom.dome.consumer.utils.Constants;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
 import org.slf4j.Logger;
@@ -26,39 +27,31 @@ public class KafkaSpout extends BaseRichSpout {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaSpout.class);
 
-    private static final String SENTENCE = "sentence";
-    private static final String KAFKA_CONSUMER_GROUP = "MasterGroup";
-
     private static final int NUMBER_OF_STREAMS_TO_REGISTER = 1;
-    private static final int BATCH_SIZE = 200;
-    private static final int QUEUE_CAPACITY = 2 * BATCH_SIZE;
+    private static final int QUEUE_CAPACITY = 2 * Constants.BATCH_SIZE;
 
-    private final ExecutorService executor;
-    private final String topic;
-
-    private BlockingQueue<String> queue;
-
-    private ConsumerConnector consumerConnector;
     private SpoutOutputCollector collector;
 
-    private List<String> batch;
-    private KafkaConsumer kafkaConsumer;
+    private final String topic;
+
+    transient private ExecutorService executor;
+    transient private BlockingQueue<String> queue;
+    transient private ConsumerConnector consumerConnector;
 
     public KafkaSpout(String topic) {
         this.topic = topic;
-        executor = Executors.newFixedThreadPool(NUMBER_OF_STREAMS_TO_REGISTER);
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields(SENTENCE));
+        declarer.declare(new Fields(Constants.SENTENCE));
     }
 
     @Override
     public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
         this.collector = spoutOutputCollector;
         this.queue = new ArrayBlockingQueue<>(QUEUE_CAPACITY);
-
+        executor = Executors.newFixedThreadPool(NUMBER_OF_STREAMS_TO_REGISTER);
         for (KafkaStream<byte[], byte[]> stream : getKafkaStream(map)) {
             executor.submit(new KafkaConsumer(this.queue, stream));
         }
@@ -66,9 +59,9 @@ public class KafkaSpout extends BaseRichSpout {
 
     private List<KafkaStream<byte[], byte[]>> getKafkaStream(Map map) {
         LOGGER.info("Getting connector...");
-        final Map<String, Object> kafkaConfig = (Map<String, Object>) map.get("KafkaConfig");
+        final Map<String, Object> kafkaConfig = (Map<String, Object>) map.get(Constants.KAFKA_CONFIG_KEY);
 
-        this.consumerConnector = ConsumerConnectorManager.getInstance().getConnector(KAFKA_CONSUMER_GROUP, kafkaConfig);
+        this.consumerConnector = ConsumerConnectorManager.getInstance().getConnector(Constants.KAFKA_CONSUMER_GROUP, kafkaConfig);
 
         Map<String, List<KafkaStream<byte[], byte[]>>> messageStreams = consumerConnector.createMessageStreams(getTopicCountMap());
         return messageStreams.get(this.topic);
@@ -83,12 +76,12 @@ public class KafkaSpout extends BaseRichSpout {
     @Override
     public void nextTuple() {
 
-        batch = new ArrayList<>();
+        List<String> batch = new ArrayList<>();
         int i = 0;
 
         try {
             String poll;
-            while (i++ < BATCH_SIZE && (poll = queue.poll(1, TimeUnit.SECONDS)) != null) {
+            while (i++ < Constants.BATCH_SIZE && (poll = queue.poll(1, TimeUnit.SECONDS)) != null) {
                 batch.add(poll);
             }
             emit(batch);

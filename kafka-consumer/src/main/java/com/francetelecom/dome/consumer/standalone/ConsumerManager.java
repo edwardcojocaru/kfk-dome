@@ -1,6 +1,7 @@
 package com.francetelecom.dome.consumer.standalone;
 
 import com.francetelecom.dome.consumer.ConsumerConnectorManager;
+import com.francetelecom.dome.consumer.configuration.Configurable;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
 import org.slf4j.Logger;
@@ -25,13 +26,15 @@ public class ConsumerManager implements Callable<String> {
     private final ExecutorService executorService;
     private final String topic;
     private final int count;
+    private Configurable configurable;
 
-    public ConsumerManager(String topic, int count) {
-        this(topic, count, "MasterGroupXYZ");
+    public ConsumerManager(String topic, int count, Configurable configurable) {
+        this(topic, count, configurable, "MasterGroupXYZ");
     }
 
-    private ConsumerManager(String topic, int count, String group) {
-        this.consumer = ConsumerConnectorManager.getInstance().getConnector(group);
+    private ConsumerManager(String topic, int count, Configurable configurable, String group) {
+        this.configurable = configurable;
+        this.consumer = ConsumerConnectorManager.getInstance().getConnector(configurable, group);
 
         this.executorService = Executors.newFixedThreadPool(count);
         this.topic = topic;
