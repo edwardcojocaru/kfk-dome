@@ -17,17 +17,21 @@ public class Configuration {
 
     private String watchedDirectory;
 
+    private int managementPort;
+
     public Configuration(List<Profile> profiles, int liveCapacity) {
-        this(profiles, liveCapacity, null);
+        this(profiles, liveCapacity, null, 12321);
     }
 
-    public Configuration(List<Profile> profiles, int liveCapacity, String watchedDirectory) {
+    public Configuration(List<Profile> profiles, int liveCapacity, String watchedDirectory, int managementPort) {
         this.profiles = profiles;
         this.liveCapacity = liveCapacity;
         this.watchedDirectory = watchedDirectory;
         if (profiles == null || profiles.isEmpty() || liveCapacity == 0) {
             throw new BadConfigurationException();
         }
+
+        this.managementPort = managementPort;
     }
 
     public List<Profile> getProfiles() {
@@ -48,6 +52,10 @@ public class Configuration {
 
     public boolean hasDirectoryToWatch() {
         return watchedDirectory != null && !watchedDirectory.isEmpty();
+    }
+
+    public int getManagementPort() {
+        return managementPort;
     }
 
     public Topic getTopic(String fileName) {

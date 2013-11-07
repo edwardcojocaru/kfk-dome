@@ -13,4 +13,8 @@ public class ServerSocketCreationException extends Exception {
         super(ex);
         this.profile = profile;
     }
+
+    public ServerSocketCreationException(Throwable e) {
+        super(e);
+    }
 }

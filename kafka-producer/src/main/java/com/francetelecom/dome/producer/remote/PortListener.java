@@ -60,10 +60,9 @@ public class PortListener implements Callable<String> {
                 try {
                     clientSocket = serverSocket.accept();
                 } catch (IOException e) {
-                    if (Thread.currentThread().isInterrupted()) {
-                        listening.set(Boolean.FALSE);
+                    if (listening.get()) {
+                        LOGGER.warn("Client may be disconnected. Skipping connection.");
                     }
-                    LOGGER.warn("Client may be disconnected. Skipping connection.");
                     continue;
                 }
 
@@ -78,7 +77,7 @@ public class PortListener implements Callable<String> {
             }
 
         } catch (IOException e) {
-            LOGGER.error("IOException raised d.", e);
+            LOGGER.error("Socket problem for port {}", listeningPort, e);
             throw new ServerSocketCreationException(profile, e);
         }
 
@@ -98,10 +97,11 @@ public class PortListener implements Callable<String> {
 
     public void close() {
         try {
+            LOGGER.info("Stoping listener on port {}", profile.getListeningPort());
+            listening.set(Boolean.FALSE);
             if (serverSocket != null) {
                 serverSocket.close();
             }
-            listening.set(Boolean.FALSE);
         } catch (IOException e) {
             LOGGER.warn("Socket may be already closed.");
         }

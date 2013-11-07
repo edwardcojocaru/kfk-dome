@@ -3,13 +3,13 @@ package com.francetelecom.dome.producer.watcher;
 import com.francetelecom.dome.beans.Configuration;
 import com.francetelecom.dome.beans.Topic;
 import com.francetelecom.dome.producer.DomeProducer;
+import com.francetelecom.dome.producer.ProducerRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.GZIPInputStream;
@@ -26,7 +26,7 @@ public class DirectoryWatcher implements Callable<String> {
     private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryWatcher.class);
     public static final String GZIP_FILE = "application/x-gzip";
 
-    private final ExecutorService executor;
+    private final ProducerRunner producerRunner;
     private Configuration configuration;
 
     private final WatchService watcher;
@@ -34,8 +34,8 @@ public class DirectoryWatcher implements Callable<String> {
 
     private AtomicBoolean watching = new AtomicBoolean(Boolean.TRUE);
 
-    public DirectoryWatcher(String path, ExecutorService executor, Configuration configuration) throws IOException {
-        this.executor = executor;
+    public DirectoryWatcher(String path, ProducerRunner producerRunner, Configuration configuration) throws IOException {
+        this.producerRunner = producerRunner;
         this.configuration = configuration;
         this.watcher = FileSystems.getDefault().newWatchService();
 
@@ -76,8 +76,10 @@ public class DirectoryWatcher implements Callable<String> {
                 try {
                     child = watchedDirectory.resolve(filename);
                     LOGGER.info("Start processing file: {}.", child);
-                    if (!Files.probeContentType(child).equals(GZIP_FILE)) {
-                        LOGGER.warn(String.format("Unsupported file type. File name {}.", filename));
+                    final String fileType = Files.probeContentType(child);
+
+                    if (!fileType.equals(GZIP_FILE)) {
+                        LOGGER.warn("Unsupported file type. File name {}. File type: {}", child, fileType);
                         continue;
                     }
                 } catch (IOException x) {
@@ -88,7 +90,7 @@ public class DirectoryWatcher implements Callable<String> {
                 final Topic topic = configuration.getTopic(child.getFileName().toString());
                 if (topic != null) {
                     LOGGER.info("Register job for {}", child);
-                    final Future<String> submit = executor.submit(new DomeProducer(topic, new GZIPInputStream(Files.newInputStream(child))));
+                    final Future<String> submit = producerRunner.submitProducer(new DomeProducer(topic, new GZIPInputStream(Files.newInputStream(child))));
                     LOGGER.info(submit.get());
                 } else  {
                     LOGGER.info("No topic file prefix match current file.");
@@ -115,5 +117,10 @@ public class DirectoryWatcher implements Callable<String> {
 
     public void stopWatching() {
         this.watching.set(Boolean.FALSE);
+        try {
+            watcher.close();
+        } catch (IOException e) {
+            LOGGER.warn("Watcher may be already closed.");
+        }
     }
 }

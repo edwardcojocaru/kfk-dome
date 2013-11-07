@@ -19,19 +19,19 @@ public class Utils {
     }
 
     public static boolean waitToStopExecutorWorker(ExecutorService executorService) {
-        return Utils.waitToStopExecutor(10, TimeUnit.SECONDS, executorService);
+        return Utils.waitToStopExecutor(10, TimeUnit.MINUTES, executorService);
     }
 
     public static boolean waitToStopExecutor(int timeout, TimeUnit minutes, ExecutorService workerExecutor1) {
 
         boolean isExecutorTerminated = false;
 
+        workerExecutor1.shutdown();
         try {
             isExecutorTerminated = workerExecutor1.awaitTermination(timeout, minutes);
         } catch (InterruptedException e) {
             LOGGER.info("Executor interrupted.");
         }
-        workerExecutor1.shutdown();
 
         return isExecutorTerminated;
     }

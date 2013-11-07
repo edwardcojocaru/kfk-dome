@@ -34,9 +34,10 @@ public class ConfigInitializer {
 
         try {
 
-            final int liveCapacity = configurable.getIntProperty(Constants.THREADS_NUMBER);
+            final int liveCapacity = configurable.getIntProperty(Constants.THREADS_NUMBER, Constants.DEFAULT_THREADS_NUMBER);
             final String watchedDirectory = configurable.getStringProperty(Constants.WATCHED_DIRECTORY);
-            configuration = new Configuration(getProfiles(liveCapacity), liveCapacity, watchedDirectory);
+            final int managementPort = configurable.getIntProperty(Constants.MANAGEMENT_PORT, Constants.DEFAULT_MANAGEMENT_PORT);
+            configuration = new Configuration(getProfiles(liveCapacity), liveCapacity, watchedDirectory, managementPort);
 
         } catch (Exception ex) {
             LOGGER.error("The configuration file might be wrong.", ex);

@@ -45,10 +45,6 @@ public class ApplicationStarter {
         }
 
         applicationStarter.start(configurationPath);
-        LOGGER.info("Application started.");
-
-        Thread.sleep(10 * 1000);
-        applicationStarter.stopProducing();
     }
 
     private void start(String configurationPath) throws IOException {
@@ -64,12 +60,14 @@ public class ApplicationStarter {
             this.listeners.put(profile, listener);
         }
 
-        directoryWatcherManager = new DirectoryWatcherManager(this.configuration);
+        directoryWatcherManager = new DirectoryWatcherManager(this.configuration, this.producerRunner);
         directoryWatcherManager.watch();
+
+        new ApplicationManagement(this, configuration).start();
 
         for (Future<String> future : this.topicFutures) {
             try {
-                final String result = future.get(5, TimeUnit.SECONDS);
+                final String result = future.get(1, TimeUnit.SECONDS);
                 LOGGER.debug("Result: {}", result);
             } catch (TimeoutException timeoutException) {
                 LOGGER.debug("Connection must be opened.");
@@ -79,6 +77,7 @@ public class ApplicationStarter {
                 LOGGER.error("Thread interrupted.", iex);
             }
         }
+        LOGGER.info("Application started.");
     }
 
     public void stopProducing() {
@@ -89,6 +88,7 @@ public class ApplicationStarter {
         }
 
         boolean isExecutorTerminated = Utils.waitToStopExecutorManager(this.topicRunner);
+        directoryWatcherManager.stopWatching();
 
         if (!isExecutorTerminated) {
             try {
@@ -99,6 +99,5 @@ public class ApplicationStarter {
         }
 
         producerRunner.initializeProducerTermination();
-        directoryWatcherManager.stopWatching();
     }
 }
