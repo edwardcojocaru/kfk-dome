@@ -6,6 +6,8 @@ import backtype.storm.topology.TopologyBuilder;
 import com.francetelecom.dome.consumer.configuration.Configurable;
 import com.francetelecom.dome.consumer.configuration.ConfigurableFactory;
 import com.francetelecom.dome.consumer.utils.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +17,8 @@ import java.util.Map;
  * Date: 11/4/13
  */
 public class StormTopology {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(StormTopology.class);
 
     private static final String KAFKA_SPOUT_PREFIX = "kafkaSpout-";
     private static final String BOLT_PREFIX = "SimpleBolt-";
@@ -33,7 +37,9 @@ public class StormTopology {
 
         final String topics = configurable.getStringProperty(Constants.TOPICS, "");
         if (topics.isEmpty()) {
-            System.err.println("'topics' property not specified.");
+            final String message = "'topics' property not specified.";
+            LOGGER.info(message);
+            System.err.println(message);
             return;
         }
 
@@ -42,14 +48,19 @@ public class StormTopology {
             final String boltId = BOLT_PREFIX + topic;
             final int parallelismHint = configurable.getIntProperty(topic + SPOUT_PARALLELISM, Constants.SPOUT_PARALLELISM_DEFAULT_VALUE);
 
+            LOGGER.info("adding kafka spout for '{}'.", topic);
+            LOGGER.debug("SpoutId: {}, BoltId: {}", spoutId, boltId);
+
             builder.setSpout(spoutId, new KafkaSpout(topic), parallelismHint);
             builder.setBolt(boltId, new SimpleBolt()).shuffleGrouping(spoutId);
         }
 
         final Map<String, Object> stormConfiguration = getStormConfiguration(configurable);
         if (configurable.getBooleanProperty(Constants.CLUSTER_MODE)) {
+            LOGGER.info("Starting topology in cluster mode.");
             StormSubmitter.submitTopology("kafkaConsumer", stormConfiguration, builder.createTopology());
         } else {
+            LOGGER.info("Starting topology in local mode.");
             LocalCluster cluster = new LocalCluster();
             cluster.submitTopology("kafkaConsumer", stormConfiguration, builder.createTopology());
         }
@@ -58,6 +69,9 @@ public class StormTopology {
     private static Map<String, Object> getStormConfiguration(Configurable configurable) {
         final Map<String, Object> stormConf = new HashMap<>();
         stormConf.put(Constants.KAFKA_CONFIG_KEY, configurable.getPropertiesAsMap());
+
+        LOGGER.debug("Storm config: {}", stormConf);
+
         return stormConf;
     }
 

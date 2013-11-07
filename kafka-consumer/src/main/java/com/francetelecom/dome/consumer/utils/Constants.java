@@ -6,15 +6,14 @@ package com.francetelecom.dome.consumer.utils;
  */
 public final class Constants {
 
-    public static final String SENTENCE = "sentence";
-    public static final String KAFKA_CONSUMER_GROUP = "MasterGroup";
-    public static final int BATCH_SIZE = 200;
-    public static final String CLUSTER_MODE = "clusterMode";
-
     private Constants() {
     }
 
-    public static final String ZOOKEEPER_ADDRESS = "zookeeperAddress";
+    public static final String SENTENCE = "sentence";
+    public static final String KAFKA_CONSUMER_GROUP = "MasterGroup";
+    public static final int BATCH_SIZE = 200;
+
+    public static final String CLUSTER_MODE = "clusterMode";
 
     public static final String CONFIGURATION_FILE_BASE_NAME = "consumer";
 

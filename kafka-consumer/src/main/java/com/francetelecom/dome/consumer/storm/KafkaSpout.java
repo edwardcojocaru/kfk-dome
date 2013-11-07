@@ -48,23 +48,24 @@ public class KafkaSpout extends BaseRichSpout {
     }
 
     @Override
-    public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
+    public void open(Map configurationMap, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
         this.collector = spoutOutputCollector;
         this.queue = new ArrayBlockingQueue<>(QUEUE_CAPACITY);
         executor = Executors.newFixedThreadPool(NUMBER_OF_STREAMS_TO_REGISTER);
-        for (KafkaStream<byte[], byte[]> stream : getKafkaStream(map)) {
+        for (KafkaStream<byte[], byte[]> stream : getKafkaStream((Map<String, Object>) configurationMap.get(Constants.KAFKA_CONFIG_KEY))) {
             executor.submit(new KafkaConsumer(this.queue, stream));
         }
     }
 
-    private List<KafkaStream<byte[], byte[]>> getKafkaStream(Map map) {
+    private List<KafkaStream<byte[], byte[]>> getKafkaStream(Map<String, Object> kafkaConfig) {
         LOGGER.info("Getting connector...");
-        final Map<String, Object> kafkaConfig = (Map<String, Object>) map.get(Constants.KAFKA_CONFIG_KEY);
-
         this.consumerConnector = ConsumerConnectorManager.getInstance().getConnector(Constants.KAFKA_CONSUMER_GROUP, kafkaConfig);
 
         Map<String, List<KafkaStream<byte[], byte[]>>> messageStreams = consumerConnector.createMessageStreams(getTopicCountMap());
-        return messageStreams.get(this.topic);
+        final List<KafkaStream<byte[], byte[]>> kafkaStreams = messageStreams.get(this.topic);
+        LOGGER.debug("Received {} streams.", kafkaStreams.size());
+
+        return kafkaStreams;
     }
 
     private Map<String, Integer> getTopicCountMap() {
@@ -92,8 +93,6 @@ public class KafkaSpout extends BaseRichSpout {
             if (!batch.isEmpty()) {
                 emit(batch);
             }
-        } finally {
-            batch = null;
         }
     }
 

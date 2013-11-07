@@ -45,7 +45,7 @@ public class ConsumerConnectorManager {
     public ConsumerConnector getConnector(String group, Map<String, Object> config) {
 
         if (!connectorsMap.containsKey(group)) {
-            LOGGER.info("Create consumer");
+            LOGGER.debug("Create consumer for group: {}", group);
             connectorsMap.put(group, Consumer.createJavaConsumerConnector(createConsumerConfig(group, config)));
         }
 

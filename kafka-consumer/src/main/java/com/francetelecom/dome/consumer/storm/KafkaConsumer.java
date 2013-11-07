@@ -24,7 +24,7 @@ public class KafkaConsumer extends Thread {
 
     @Override
     public void run() {
-        LOGGER.info("Start receiving messages from kafka.");
+        LOGGER.debug("Start receiving messages from kafka.");
         while (consumerIterator.hasNext()) {
 
             final String line = new String(consumerIterator.next().message(), ENCODING);
