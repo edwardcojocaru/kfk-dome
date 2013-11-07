@@ -33,4 +33,9 @@ public abstract class AbstractConfiguration implements Configurable {
             return defaultValue;
         }
     }
+
+    @Override
+    public boolean getBooleanProperty(String key) {
+        return Boolean.parseBoolean(getStringProperty(key));
+    }
 }

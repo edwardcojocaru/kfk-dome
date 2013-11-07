@@ -1,6 +1,7 @@
 package com.francetelecom.dome.consumer.storm;
 
 import backtype.storm.LocalCluster;
+import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
 import com.francetelecom.dome.consumer.configuration.Configurable;
 import com.francetelecom.dome.consumer.configuration.ConfigurableFactory;
@@ -45,8 +46,13 @@ public class StormTopology {
             builder.setBolt(boltId, new SimpleBolt()).shuffleGrouping(spoutId);
         }
 
-        LocalCluster cluster = new LocalCluster();
-        cluster.submitTopology("kafkaConsumer", getStormConfiguration(configurable), builder.createTopology());
+        final Map<String, Object> stormConfiguration = getStormConfiguration(configurable);
+        if (configurable.getBooleanProperty(Constants.CLUSTER_MODE)) {
+            StormSubmitter.submitTopology("kafkaConsumer", stormConfiguration, builder.createTopology());
+        } else {
+            LocalCluster cluster = new LocalCluster();
+            cluster.submitTopology("kafkaConsumer", stormConfiguration, builder.createTopology());
+        }
     }
 
     private static Map<String, Object> getStormConfiguration(Configurable configurable) {

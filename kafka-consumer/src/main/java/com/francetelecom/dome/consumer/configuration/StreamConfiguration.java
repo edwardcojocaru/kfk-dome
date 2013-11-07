@@ -42,4 +42,5 @@ public class StreamConfiguration extends AbstractConfiguration {
 
         return Collections.unmodifiableMap(conf);
     }
+
 }

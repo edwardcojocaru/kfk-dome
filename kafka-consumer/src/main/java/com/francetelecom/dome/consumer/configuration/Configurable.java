@@ -14,6 +14,7 @@ public interface Configurable {
     String getStringProperty(String key, String defaultValue);
     int getIntProperty(String key);
     int getIntProperty(String key, int defaultValue);
+    boolean getBooleanProperty(String key);
 
     Properties getProperties();
     Map<String, Object> getPropertiesAsMap();
