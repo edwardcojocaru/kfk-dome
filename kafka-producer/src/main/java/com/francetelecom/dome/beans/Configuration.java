@@ -1,6 +1,7 @@
 package com.francetelecom.dome.beans;
 
 import com.francetelecom.dome.exception.BadConfigurationException;
+import com.francetelecom.dome.util.Constants;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +21,7 @@ public class Configuration {
     private int managementPort;
 
     public Configuration(List<Profile> profiles, int liveCapacity) {
-        this(profiles, liveCapacity, null, 12321);
+        this(profiles, liveCapacity, null, Constants.DEFAULT_MANAGEMENT_PORT);
     }
 
     public Configuration(List<Profile> profiles, int liveCapacity, String watchedDirectory, int managementPort) {
