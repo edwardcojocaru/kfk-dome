@@ -1,5 +1,6 @@
 package com.francetelecom.dome.producer;
 
+import com.francetelecom.dome.util.Constants;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,7 +11,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.*;
@@ -64,7 +64,7 @@ public class ProducerRunnerTest {
 
         producerRunner.initializeProducerTermination();
 
-        verify(executor).awaitTermination(10, TimeUnit.MINUTES);
+        verify(executor).awaitTermination(Constants.MANAGERS_TIMEOUT, Constants.MANAGERS_TIMEOUT_UNITS);
     }
 
     private ProducerRunner getProducerRunner() {
@@ -74,13 +74,4 @@ public class ProducerRunnerTest {
         Executors.newFixedThreadPool(numberOfThreads);
         return producerRunner;
     }
-
-    //    public void initializeProducerTermination() {
-//        try {
-//            executor.awaitTermination(1, TimeUnit.HOURS);
-//        } catch (InterruptedException e) {
-//            // TODO handle it
-//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//        }
-//    }
 }

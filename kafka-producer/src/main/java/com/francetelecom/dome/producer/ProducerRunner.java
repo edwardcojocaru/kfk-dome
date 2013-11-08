@@ -19,7 +19,7 @@ public class ProducerRunner {
 
     public ProducerRunner(int numberOfThreads) {
         executor = Executors.newFixedThreadPool(numberOfThreads);
-        LOGGER.info("Executor created. Capacity: " + numberOfThreads);
+        LOGGER.info("Executor created. Capacity: {}", numberOfThreads);
     }
 
     public <T> Future<T> submitProducer(Callable<T> producer) {
@@ -27,6 +27,7 @@ public class ProducerRunner {
     }
 
     public void initializeProducerTermination() {
+        LOGGER.debug("Initialize producer executor termination.");
         Utils.waitToStopExecutorWorker(executor);
     }
 

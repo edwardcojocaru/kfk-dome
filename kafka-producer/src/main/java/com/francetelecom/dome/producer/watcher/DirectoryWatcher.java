@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.GZIPInputStream;
 
@@ -77,9 +76,7 @@ public class DirectoryWatcher implements Callable<String> {
                     child = watchedDirectory.resolve(filename);
                     LOGGER.info("Start processing file: {}.", child);
                     final String fileType = Files.probeContentType(child);
-                    final String fileName = child.getFileName().toString();
-                    // TODO fix fileType for linux
-                    if (!(fileType.equals(GZIP_FILE) || fileName.endsWith(".gz"))) {
+                    if (!(fileType.equals(GZIP_FILE))) {
                         LOGGER.warn("Unsupported file type. File name {}. File type: {}", child, fileType);
                         continue;
                     }
@@ -91,16 +88,21 @@ public class DirectoryWatcher implements Callable<String> {
                 final Topic topic = configuration.getTopic(child.getFileName().toString());
                 if (topic != null) {
                     LOGGER.info("Register job for {}", child);
-                    final Future<String> submit = producerRunner.submitProducer(new DomeProducer(topic, new GZIPInputStream(Files.newInputStream(child))));
-                    LOGGER.info(submit.get());
+                    final GZIPInputStream gzipInputStream;
+
+                    try {
+                        gzipInputStream = new GZIPInputStream(Files.newInputStream(child));
+                    } catch (IOException e) {
+                        LOGGER.error("Could not open file.", e);
+                        continue;
+                    }
+
+                    producerRunner.submitProducer(new DomeProducer(topic, gzipInputStream));
                 } else  {
                     LOGGER.info("No topic file prefix match current file.");
                 }
             }
 
-            // Reset the key -- this step is critical if you want to
-            // receive further watch events.  If the key is no longer valid,
-            // the directory is inaccessible so exit the loop.
             boolean valid = key.reset();
             if (!valid) {
                 LOGGER.info("Stopped watching directory.");
