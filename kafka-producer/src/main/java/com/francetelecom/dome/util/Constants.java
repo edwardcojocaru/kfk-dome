@@ -12,8 +12,10 @@ public final class Constants {
     }
 
     public static final int MANAGERS_TIMEOUT = 10;
-
     public static final TimeUnit MANAGERS_TIMEOUT_UNITS = TimeUnit.SECONDS;
+    public static final int WORKER_EXECUTOR_TIMEOUT = 10;
+    public static final TimeUnit WORKER_EXECUTOR_TIMEOUT_UNITS = TimeUnit.MINUTES;
+
     public static final String NUMBER_OF_MESSAGES_IN_BATCH = "500";
     public static final String TOPICS = "topics";
 

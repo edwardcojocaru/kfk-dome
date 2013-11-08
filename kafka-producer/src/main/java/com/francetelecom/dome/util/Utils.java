@@ -19,7 +19,7 @@ public class Utils {
     }
 
     public static boolean waitToStopExecutorWorker(ExecutorService executorService) {
-        return Utils.waitToStopExecutor(10, TimeUnit.MINUTES, executorService);
+        return Utils.waitToStopExecutor(Constants.WORKER_EXECUTOR_TIMEOUT, Constants.WORKER_EXECUTOR_TIMEOUT_UNITS, executorService);
     }
 
     public static boolean waitToStopExecutor(int timeout, TimeUnit timeUnit, ExecutorService workerExecutor1) {

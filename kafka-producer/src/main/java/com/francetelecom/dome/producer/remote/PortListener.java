@@ -38,18 +38,9 @@ public class PortListener implements Callable<String> {
 
     public String call() throws ServerSocketCreationException {
 
-        InetAddress byName = null;
-        try {
-            byName = InetAddress.getByName(profile.getListeningAddress());
-        } catch (UnknownHostException e) {
-            try {
-                byName = InetAddress.getLocalHost();
-            } catch (UnknownHostException e1) {
-                LOGGER.error("No address found and localhost not defined.");
-            }
-        }
-
+        InetAddress byName = getInetAddress(profile.getListeningAddress());
         final int listeningPort = profile.getListeningPort();
+
         try (ServerSocket serverSocket = new ServerSocket(listeningPort, 50, byName)) {
             this.serverSocket = serverSocket;
 
@@ -66,14 +57,7 @@ public class PortListener implements Callable<String> {
                     continue;
                 }
 
-                final InetAddress inetAddress = clientSocket.getInetAddress();
-
-                final boolean isAcceptedListEmpty = !profile.hasAcceptedHosts();
-
-                if (isAcceptedListEmpty || isHostInAcceptedList(inetAddress)) {
-                    LOGGER.info("Send data to callable.");
-                    runner.submitProducer(getProducer(profile, clientSocket.getInputStream()));
-                }
+                submitAcceptedProducer(clientSocket);
             }
 
         } catch (IOException e) {
@@ -82,6 +66,31 @@ public class PortListener implements Callable<String> {
         }
 
         return "ConnectionDoneForPort-" + listeningPort;
+    }
+
+    private void submitAcceptedProducer(Socket clientSocket) throws IOException {
+        final InetAddress inetAddress = clientSocket.getInetAddress();
+
+        final boolean isAcceptedListEmpty = !profile.hasAcceptedHosts();
+
+        if (isAcceptedListEmpty || isHostInAcceptedList(inetAddress)) {
+            LOGGER.info("Send data to callable.");
+            runner.submitProducer(getProducer(profile, clientSocket.getInputStream()));
+        }
+    }
+
+    private InetAddress getInetAddress(String listeningAddress) {
+        InetAddress byName = null;
+        try {
+            byName = InetAddress.getByName(listeningAddress);
+        } catch (UnknownHostException e) {
+            try {
+                byName = InetAddress.getLocalHost();
+            } catch (UnknownHostException e1) {
+                LOGGER.error("No address found and localhost not defined.");
+            }
+        }
+        return byName;
     }
 
     private boolean isHostInAcceptedList(InetAddress inetAddress) {

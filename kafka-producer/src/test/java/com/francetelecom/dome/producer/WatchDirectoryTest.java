@@ -1,5 +1,6 @@
 package com.francetelecom.dome.producer;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.nio.file.Files;
@@ -21,6 +22,7 @@ public class WatchDirectoryTest {
     public static final String FILE_PATH = "/home/ecojocaru/workspace/kafka-dev/kfk-dome/kafka-producer/src/test/resource/iups_rab_tdr-201310141645542493_csv1.gz";
 
     @Test
+    @Ignore
     public void testDirectory() throws Exception {
         Path path = Paths.get(FILE_PATH);
         String type = Files.probeContentType(path);

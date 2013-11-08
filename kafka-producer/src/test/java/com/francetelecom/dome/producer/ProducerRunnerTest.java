@@ -64,7 +64,7 @@ public class ProducerRunnerTest {
 
         producerRunner.initializeProducerTermination();
 
-        verify(executor).awaitTermination(Constants.MANAGERS_TIMEOUT, Constants.MANAGERS_TIMEOUT_UNITS);
+        verify(executor).awaitTermination(Constants.WORKER_EXECUTOR_TIMEOUT, Constants.WORKER_EXECUTOR_TIMEOUT_UNITS);
     }
 
     private ProducerRunner getProducerRunner() {
