@@ -1,5 +1,8 @@
 package com.francetelecom.dome.configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * User: Eduard.Cojocaru
  * Date: 11/5/13
@@ -33,4 +36,18 @@ public abstract class AbstractConfiguration implements Configurable {
             return defaultValue;
         }
     }
+
+    public Map<String, Object> getConfigProperties(String baseKey) {
+        Map<String, Object> config = new HashMap<>();
+
+        for (String key : getPropertyNames()) {
+            if (key.startsWith(baseKey)) {
+                String configKey = key.replace(baseKey, "");
+                config.put(configKey, getProperty(key));
+            }
+        }
+
+        return config;
+    }
+
 }

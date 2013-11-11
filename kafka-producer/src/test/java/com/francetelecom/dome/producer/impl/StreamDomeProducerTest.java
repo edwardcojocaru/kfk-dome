@@ -1,4 +1,4 @@
-package com.francetelecom.dome.producer;
+package com.francetelecom.dome.producer.impl;
 
 import com.francetelecom.dome.beans.Topic;
 import kafka.javaapi.producer.Producer;
@@ -26,15 +26,15 @@ import static org.powermock.api.mockito.PowerMockito.*;
  * Date: 10/29/13
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({DomeProducer.class, Topic.class, BufferedReader.class, Producer.class, ProducerConfig.class, KeyedMessage.class})
-public class DomeProducerTest {
+@PrepareForTest({StreamDomeProducer.class, Topic.class, BufferedReader.class, Producer.class, ProducerConfig.class, KeyedMessage.class})
+public class StreamDomeProducerTest {
 
     private String constantValue;
     private Topic topic;
     private ProducerConfig config;
     private Producer producer;
     private BufferedReader reader;
-    private DomeProducer domeProducer;
+    private StreamDomeProducer domeProducer;
     private InputStream inputStream;
 
     @Before
@@ -53,7 +53,7 @@ public class DomeProducerTest {
 
         inputStream = mock(InputStream.class);
 
-        domeProducer = new DomeProducer(topic, inputStream);
+        domeProducer = new StreamDomeProducer(topic, inputStream);
     }
 
     @Test

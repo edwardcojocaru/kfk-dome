@@ -5,6 +5,7 @@ import com.francetelecom.dome.util.Constants;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: eduard.cojocaru
@@ -17,17 +18,19 @@ public class Configuration {
     private int liveCapacity;
 
     private String watchedDirectory;
+    private Map<String, Object> producerConfig;
 
     private int managementPort;
 
     public Configuration(List<Profile> profiles, int liveCapacity) {
-        this(profiles, liveCapacity, null, Constants.DEFAULT_MANAGEMENT_PORT);
+        this(profiles, liveCapacity, null, Constants.DEFAULT_MANAGEMENT_PORT, null);
     }
 
-    public Configuration(List<Profile> profiles, int liveCapacity, String watchedDirectory, int managementPort) {
+    public Configuration(List<Profile> profiles, int liveCapacity, String watchedDirectory, int managementPort, Map<String, Object> producerConfig) {
         this.profiles = profiles;
         this.liveCapacity = liveCapacity;
         this.watchedDirectory = watchedDirectory;
+        this.producerConfig = producerConfig;
         if (profiles == null || profiles.isEmpty() || liveCapacity == 0) {
             throw new BadConfigurationException();
         }
@@ -72,5 +75,9 @@ public class Configuration {
         }
 
         return null;
+    }
+
+    public Map<String, Object> getProducerConfig() {
+        return producerConfig;
     }
 }

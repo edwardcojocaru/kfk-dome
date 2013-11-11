@@ -59,7 +59,7 @@ public class KafkaSpout extends BaseRichSpout {
 
     private List<KafkaStream<byte[], byte[]>> getKafkaStream(Map<String, Object> kafkaConfig) {
         LOGGER.info("Getting connector...");
-        this.consumerConnector = ConsumerConnectorManager.getInstance().getConnector(Constants.KAFKA_CONSUMER_GROUP, kafkaConfig);
+        this.consumerConnector = ConsumerConnectorManager.getInstance().getConnector(Constants.KAFKA_CONSUMER_GROUP + "-" + this.topic, kafkaConfig);
 
         Map<String, List<KafkaStream<byte[], byte[]>>> messageStreams = consumerConnector.createMessageStreams(getTopicCountMap());
         final List<KafkaStream<byte[], byte[]>> kafkaStreams = messageStreams.get(this.topic);

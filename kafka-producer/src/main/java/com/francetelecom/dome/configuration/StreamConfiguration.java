@@ -3,6 +3,7 @@ package com.francetelecom.dome.configuration;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * User: Eduard.Cojocaru
@@ -20,5 +21,10 @@ public class StreamConfiguration extends AbstractConfiguration {
     @Override
     public Object getProperty(String key) {
         return properties.getProperty(key);
+    }
+
+    @Override
+    public Set<String> getPropertyNames() {
+        return properties.stringPropertyNames();
     }
 }

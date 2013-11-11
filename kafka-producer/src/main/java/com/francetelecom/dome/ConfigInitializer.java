@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: eduard.cojocaru Date: 10/29/13
@@ -37,7 +38,9 @@ public class ConfigInitializer {
             final int liveCapacity = configurable.getIntProperty(Constants.THREADS_NUMBER, Constants.DEFAULT_THREADS_NUMBER);
             final String watchedDirectory = configurable.getStringProperty(Constants.WATCHED_DIRECTORY);
             final int managementPort = configurable.getIntProperty(Constants.MANAGEMENT_PORT, Constants.DEFAULT_MANAGEMENT_PORT);
-            configuration = new Configuration(getProfiles(liveCapacity), liveCapacity, watchedDirectory, managementPort);
+            final Map<String, Object> producerConfig = configurable.getConfigProperties(Constants.BASE_PRODUCER_CONFIG);
+
+            configuration = new Configuration(getProfiles(liveCapacity), liveCapacity, watchedDirectory, managementPort, producerConfig);
 
         } catch (Exception ex) {
             LOGGER.error("The configuration file might be wrong.", ex);
@@ -76,7 +79,6 @@ public class ConfigInitializer {
         final String address = configurable.getStringProperty(topic + Constants.ADDRESS_SUFFIX);
         final String brokers = configurable.getStringProperty(topic + Constants.BROKERS_SUFFIX);
         final String filePrefix = configurable.getStringProperty(topic + Constants.TOPIC_FILE_PREFIX);
-
 
         List<Topic> topics = new ArrayList<>();
         topics.add(new Topic(topic, brokers, filePrefix));

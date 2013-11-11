@@ -1,42 +1,46 @@
-package com.francetelecom.dome.producer;
+package com.francetelecom.dome.producer.impl;
 
 import com.francetelecom.dome.beans.ProducerType;
 import com.francetelecom.dome.beans.Topic;
 import com.francetelecom.dome.util.Constants;
 import kafka.javaapi.producer.Producer;
-import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.Callable;
 
 /**
- * User: eduard.cojocaru
- * Date: 10/29/13
+ * User: Eduard.Cojocaru
+ * Date: 11/11/13
  */
-public class DomeProducer implements Callable<String> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DomeProducer.class);
+public abstract class AbstractDomeProducer implements DomeProducer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(StreamDomeProducer.class);
 
     private final ProducerType producerType = ProducerType.ASYNC;
 
-    private final Producer<String, String> producer;
+    protected final Producer<String, String> producer;
 
     private final Properties properties = new Properties();
 
-    private final Topic topic;
+    protected final Topic topic;
 
-    private final InputStream inputStream;
+    protected final InputStream inputStream;
 
-    public DomeProducer(Topic topic, InputStream inputStream) {
+    public AbstractDomeProducer(Topic topic, InputStream inputStream) {
+        this(topic, inputStream, null);
+    }
+
+    public AbstractDomeProducer(ProducerContext producerContext) {
+        this(producerContext.getTopic(), producerContext.getInputStream(), producerContext.getProducerConfig());
+    }
+
+    public AbstractDomeProducer(Topic topic, InputStream inputStream, Map<String, Object> additionalConfig) {
 
         LOGGER.info("Initializing producer...");
         LOGGER.info("Topic name: " + topic.getName());
@@ -46,13 +50,13 @@ public class DomeProducer implements Callable<String> {
             LOGGER.debug("Producer type: " + producerType);
         }
 
-        final ProducerConfig producerConfig = getProducerConfig(topic);
+        final ProducerConfig producerConfig = getProducerConfig(topic, additionalConfig);
         this.producer = new Producer<>(producerConfig);
         this.topic = topic;
         this.inputStream = inputStream;
     }
 
-    private ProducerConfig getProducerConfig(Topic topic) {
+    private ProducerConfig getProducerConfig(Topic topic, Map<String, Object> additionalConfig) {
         properties.put("serializer.class", "kafka.serializer.StringEncoder");
         properties.put("metadata.broker.list", topic.getBrokerList());
         properties.put("request.required.acks", topic.getAcknowledge());
@@ -60,10 +64,14 @@ public class DomeProducer implements Callable<String> {
         // TODO may be externalize the producer type and the number of messages in batch
         properties.put("producer.type", producerType.getValue());
         properties.put("batch.num.messages", Constants.NUMBER_OF_MESSAGES_IN_BATCH);
+        properties.put("compression.codec", "none"/*, "gzip" and "snappy"*/);
+
+        if (additionalConfig != null) {
+            properties.putAll(additionalConfig);
+        }
 
         return new ProducerConfig(properties);
     }
-
     @Override
     public String call() throws IOException {
 
@@ -71,16 +79,7 @@ public class DomeProducer implements Callable<String> {
         // TODO check if the IOException should be handled in thread and not outside
         final long initialTime = System.nanoTime();
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-            final String topicName = topic.getName();
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                producer.send(new KeyedMessage<String, String>(topicName, line));
-            }
-        } finally {
-            producer.close();
-        }
+        processStream(inputStream);
 
         final long endTime = System.nanoTime();
 
@@ -92,4 +91,7 @@ public class DomeProducer implements Callable<String> {
 
         return timeTaken;
     }
+
+    protected abstract void processStream(InputStream inputStream) throws IOException;
+
 }

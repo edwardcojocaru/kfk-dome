@@ -11,6 +11,10 @@ public final class Constants {
     private Constants() {
     }
 
+    public static final String GZIP_FILE = "application/x-gzip";
+
+    public static final String BASE_PRODUCER_CONFIG = "producer.config.";
+
     public static final int MANAGERS_TIMEOUT = 10;
     public static final TimeUnit MANAGERS_TIMEOUT_UNITS = TimeUnit.SECONDS;
     public static final int WORKER_EXECUTOR_TIMEOUT = 10;

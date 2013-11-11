@@ -2,7 +2,8 @@ package com.francetelecom.dome.producer.remote;
 
 import com.francetelecom.dome.beans.Profile;
 import com.francetelecom.dome.exception.ServerSocketCreationException;
-import com.francetelecom.dome.producer.DomeProducer;
+import com.francetelecom.dome.producer.impl.ProducerContext;
+import com.francetelecom.dome.producer.impl.StreamDomeProducer;
 import com.francetelecom.dome.producer.ProducerRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -24,6 +26,7 @@ public class PortListener implements Callable<String> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PortListener.class);
     private final ProducerRunner runner;
+    private Map<String, Object> producerConfig;
 
     private final Profile profile;
 
@@ -31,9 +34,10 @@ public class PortListener implements Callable<String> {
 
     private ServerSocket serverSocket;
 
-    public PortListener(Profile profile, ProducerRunner executor) {
+    public PortListener(Profile profile, ProducerRunner executor, Map<String, Object> producerConfig) {
         this.profile = profile;
         this.runner = executor;
+        this.producerConfig = producerConfig;
     }
 
     public String call() throws ServerSocketCreationException {
@@ -101,7 +105,9 @@ public class PortListener implements Callable<String> {
 
     private Callable getProducer(Profile profile, InputStream inputStream) {
         LOGGER.info("Getting dome producer.");
-        return new DomeProducer(profile.getTopics().get(0), inputStream);
+
+        final ProducerContext producerContext = new ProducerContext(profile.getTopics().get(0), producerConfig, inputStream);
+        return new StreamDomeProducer(producerContext);
     }
 
     public void close() {

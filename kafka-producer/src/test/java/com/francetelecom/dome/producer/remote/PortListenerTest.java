@@ -3,8 +3,9 @@ package com.francetelecom.dome.producer.remote;
 import com.francetelecom.dome.beans.Profile;
 import com.francetelecom.dome.beans.Topic;
 import com.francetelecom.dome.exception.ServerSocketCreationException;
-import com.francetelecom.dome.producer.DomeProducer;
 import com.francetelecom.dome.producer.ProducerRunner;
+import com.francetelecom.dome.producer.impl.ProducerContext;
+import com.francetelecom.dome.producer.impl.StreamDomeProducer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -23,6 +24,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static junit.framework.Assert.assertEquals;
@@ -37,7 +39,7 @@ import static org.powermock.api.mockito.PowerMockito.*;
  * Date: 10/29/13
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({PortListener.class, ProducerRunner.class, ServerSocket.class, InetAddress.class, Socket.class, DomeProducer.class, Profile.class, Topic.class})
+@PrepareForTest({PortListener.class, ProducerRunner.class, ServerSocket.class, InetAddress.class, Socket.class, StreamDomeProducer.class, Profile.class, Topic.class, ProducerContext.class})
 public class PortListenerTest {
 
     @Test
@@ -46,7 +48,7 @@ public class PortListenerTest {
         final ProducerRunner executor = mock(ProducerRunner.class);
         final Profile profile = mock(Profile.class);
 
-        final PortListener portListener = new PortListener(profile, executor);
+        final PortListener portListener = new PortListener(profile, executor, null);
 
         assertEquals(profile, getField("profile").get(portListener));
         assertEquals(executor, getField("runner").get(portListener));
@@ -69,7 +71,7 @@ public class PortListenerTest {
         final ProducerRunner runner = mock(ProducerRunner.class);
         final Profile profile = mock(Profile.class);
 
-        PortListener listener = spy(new PortListener(profile, runner));
+        PortListener listener = spy(new PortListener(profile, runner, null));
         final InetAddress localHost = InetAddress.getLocalHost();
         doReturn(localHost).when(listener, "getInetAddress", listeningAddress);
         when(profile.getListeningPort()).thenReturn(listeningPort);
@@ -116,7 +118,7 @@ public class PortListenerTest {
         final ProducerRunner executor = mock(ProducerRunner.class);
         final Profile profile = mock(Profile.class);
 
-        final PortListener portListener = new PortListener(profile, executor);
+        final PortListener portListener = new PortListener(profile, executor, null);
 
         final String getInetAddress = "getInetAddress";
         final Class<?>[] stringClass = new Class<?>[]{String.class};
@@ -147,19 +149,31 @@ public class PortListenerTest {
         final List<Topic> topics = new ArrayList() {{add(topic);}};
         when(profile.getTopics()).thenReturn(topics);
 
-        final PortListener portListener = new PortListener(profile, executor);
+        final PortListener portListener = new PortListener(profile, executor, null);
         final InputStream inputStream = mock(InputStream.class);
-        final Constructor<DomeProducer> domeProducerConstructor = DomeProducer.class.getConstructor(Topic.class, InputStream.class);
-        final DomeProducer domeProducer = mock(DomeProducer.class);
-        whenNew(domeProducerConstructor).withArguments(topic, inputStream).thenReturn(domeProducer);
+
+        final Constructor<ProducerContext> producerContextConstructor = ProducerContext.class.getConstructor(Topic.class, Map.class, InputStream.class);
+        final ProducerContext producerContext = mock(ProducerContext.class);
+        whenNew(producerContextConstructor).withArguments(topic, null, inputStream).thenReturn(producerContext);
+
+        final Constructor<StreamDomeProducer> domeProducerConstructor = StreamDomeProducer.class.getConstructor(ProducerContext.class);
+        final StreamDomeProducer domeProducer = mock(StreamDomeProducer.class);
+        whenNew(domeProducerConstructor).withArguments(producerContext).thenReturn(domeProducer);
 
         final Method getProducerMethod = getMethod(portListener, "getProducer", Profile.class, InputStream.class);
         final Object invoke = getProducerMethod.invoke(portListener, profile, inputStream);
         assertEquals(domeProducer, invoke);
 
         verify(profile).getTopics();
-        final ConstructorArgumentsVerification constructorArgumentsVerification = verifyNew(DomeProducer.class);
-        constructorArgumentsVerification.withArguments(topic, inputStream);
+
+        final ConstructorArgumentsVerification checkProducerContext = verifyNew(ProducerContext.class);
+        checkProducerContext.withArguments(topic, null, inputStream);
+
+        final ConstructorArgumentsVerification constructorArgumentsVerification = verifyNew(StreamDomeProducer.class);
+        constructorArgumentsVerification.withArguments(producerContext);
+
+
+
 
     }
 
@@ -169,7 +183,7 @@ public class PortListenerTest {
         final ProducerRunner runner = mock(ProducerRunner.class);
         final Profile profile = mock(Profile.class);
 
-        PortListener listener = new PortListener(profile, runner);
+        PortListener listener = new PortListener(profile, runner, null);
         ServerSocket serverSocket = mock(ServerSocket.class);
 
         final Field serverSocketField = getField("serverSocket");
@@ -189,7 +203,7 @@ public class PortListenerTest {
         final ProducerRunner runner = mock(ProducerRunner.class);
         final Profile profile = mock(Profile.class);
 
-        PortListener listener = new PortListener(profile, runner);
+        PortListener listener = new PortListener(profile, runner, null);
         ServerSocket serverSocket = mock(ServerSocket.class);
         Mockito.doThrow(new IOException()).when(serverSocket).close();
 
@@ -210,7 +224,7 @@ public class PortListenerTest {
         final ProducerRunner runner = mock(ProducerRunner.class);
         final Profile profile = mock(Profile.class);
 
-        PortListener listener = new PortListener(profile, runner);
+        PortListener listener = new PortListener(profile, runner, null);
 
         assertTrue(((AtomicBoolean)getField("listening").get(listener)).get());
 

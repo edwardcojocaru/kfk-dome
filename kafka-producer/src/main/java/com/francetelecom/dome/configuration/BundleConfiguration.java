@@ -1,6 +1,7 @@
 package com.francetelecom.dome.configuration;
 
 import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * User: Eduard.Cojocaru
@@ -17,5 +18,10 @@ public class BundleConfiguration extends AbstractConfiguration {
     @Override
     public Object getProperty(String key) {
         return bundle.getString(key);
+    }
+
+    @Override
+    public Set<String> getPropertyNames() {
+        return bundle.keySet();
     }
 }
