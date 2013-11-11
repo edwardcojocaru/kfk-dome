@@ -29,10 +29,15 @@ public class ProducerContext {
     private InputStream inputStream;
 
     private static final Set<String> SUPPORTED_EXTENSIONS = new HashSet<>();
+    private static final Set<String> SUPPORTED_FILE_TYPES = new HashSet<>();
 
     static {
         SUPPORTED_EXTENSIONS.add(".gz");
         SUPPORTED_EXTENSIONS.add(".tgz");
+        SUPPORTED_EXTENSIONS.add(".tar.gz");
+
+        SUPPORTED_FILE_TYPES.add(Constants.GZIP_FILE);
+        SUPPORTED_FILE_TYPES.add(Constants.TAR_FILE);
     }
 
     public ProducerContext(String fileName, String fileType, Topic topic, InputStream inputStream, Map<String, Object> producerConfig) {
@@ -100,17 +105,22 @@ public class ProducerContext {
     }
 
     public boolean isUnsupportedFileType() {
-        if (!Constants.GZIP_FILE.equals(fileType)) {
+        if (!SUPPORTED_FILE_TYPES.contains(fileType)) {
             return true;
         }
 
         boolean extensionFound = false;
-        for (String extension : SUPPORTED_EXTENSIONS) {
-            if (fileName.endsWith(extension)) {
-                extensionFound = true;
-                break;
+        if (Constants.GZIP_FILE.equals(fileType)) {
+            for (String extension : SUPPORTED_EXTENSIONS) {
+                if (fileName.endsWith(extension)) {
+                    extensionFound = true;
+                    break;
+                }
             }
+        } else {
+            return false;
         }
+
         return !extensionFound;
     }
 }

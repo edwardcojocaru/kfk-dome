@@ -12,6 +12,7 @@ public final class Constants {
     }
 
     public static final String GZIP_FILE = "application/x-gzip";
+    public static final String TAR_FILE = "application/x-gtar";
 
     public static final String BASE_PRODUCER_CONFIG = "producer.config.";
 

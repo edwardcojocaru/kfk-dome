@@ -15,10 +15,12 @@ public class ProducerFactory {
         final String fileType = context.getFileType();
         final String fileName = context.getFileName();
 
-        if (Constants.GZIP_FILE.equals(fileType) && fileName.endsWith(".gz")) {
-            return new GzipDomeProducer(context);
-        } else if (Constants.GZIP_FILE.equals(fileType) && fileName.endsWith(".tgz")) {
+        if (Constants.GZIP_FILE.equals(fileType) && (fileName.endsWith(".tgz") || fileName.endsWith(".tar.gz"))) {
             return new TgzDomeProducer(context);
+        } else if (Constants.GZIP_FILE.equals(fileType) && fileName.endsWith(".tgz")) {
+            return new GzipDomeProducer(context);
+        } else if (Constants.TAR_FILE.equals(fileType)) {
+            return new TarDomeProducer(context);
         } else {
             return new StreamDomeProducer(context);
         }
