@@ -6,12 +6,14 @@ import backtype.storm.topology.IRichBolt;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import com.francetelecom.dome.consumer.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,15 +34,58 @@ public class SimpleBolt implements IRichBolt {
     private BufferedWriter writer;
 
     @Override
-    public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
+    public void prepare(Map configurationMap, TopologyContext topologyContext, OutputCollector outputCollector) {
         String fileName = "boltOutput" + hashCode() + ".log";
 
+        LOGGER.info("Configuration: {}", configurationMap);
+
         try {
-            Path path = Paths.get("/tmp/bolt/" + fileName);
+            Path path = getFilePath(fileName, this.<String, Object>cast(configurationMap));
+
+            LOGGER.info("Create output file {}", path);
             writer = Files.newBufferedWriter(path, ENCODING);
         } catch (IOException e) {
             LOGGER.error("File creation ex.", e);
         }
+    }
+
+    private Path getFilePath(String fileName, Map<String, Object> configProperties) throws IOException {
+        LOGGER.debug("create directories if not existent.");
+        String directoryPathName = (String)configProperties.get("bolt.output.directory");
+
+        final boolean useDefault = Boolean.parseBoolean((String) configProperties.get("use.default.bolt.output.directory"));
+        if (useDefault) {
+            if (hasLength(directoryPathName)) {
+                LOGGER.warn("Bolt output directory not provided. Using default: '/tmp/bolt/'");
+                directoryPathName = "/tmp/bolt/";
+            }
+        } else {
+            if (hasLength(directoryPathName)) {
+                LOGGER.error("'bolt.output.directory' not provided");
+                throw new IllegalArgumentException("'bolt.output.directory' not provided");
+            }
+        }
+
+        final Path directoryPath = Paths.get(directoryPathName);
+        if (Files.notExists(directoryPath)) {
+            Files.createDirectories(directoryPath);
+            LOGGER.debug("Created directories for {}" + directoryPath);
+        }
+
+        directoryPathName = directoryPath.toString();
+        final String separator = FileSystems.getDefault().getSeparator();
+        directoryPathName = directoryPath + ((directoryPathName.endsWith(separator))?  separator : "");
+
+        return Paths.get(directoryPathName + fileName);
+    }
+
+    private boolean hasLength(String directoryPathName) {
+        return directoryPathName == null || directoryPathName.isEmpty();
+    }
+
+    @SuppressWarnings("unchecked")
+    private <K,V> Map<K, V> cast(Map configurationMap) {
+        return (Map<K, V>) configurationMap.get(Constants.KAFKA_CONFIG_KEY);
     }
 
     @Override
