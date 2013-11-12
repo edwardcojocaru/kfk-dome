@@ -11,6 +11,8 @@ public final class Constants {
     private Constants() {
     }
 
+
+    public static final String PLAIN_TEXT_FILE = "text/plain";
     public static final String GZIP_FILE = "application/x-gzip";
     public static final String TAR_FILE = "application/x-gtar";
 

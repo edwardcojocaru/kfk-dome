@@ -21,8 +21,10 @@ public class ProducerFactory {
             return new GzipDomeProducer(context);
         } else if (Constants.TAR_FILE.equals(fileType)) {
             return new TarDomeProducer(context);
-        } else {
+        } else if (Constants.PLAIN_TEXT_FILE.equals(fileType)){
             return new StreamDomeProducer(context);
+        } else {
+            throw new IllegalArgumentException("Unsupported file type");
         }
     }
 }

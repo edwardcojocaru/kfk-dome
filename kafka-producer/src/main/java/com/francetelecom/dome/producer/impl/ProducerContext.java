@@ -38,6 +38,7 @@ public class ProducerContext {
 
         SUPPORTED_FILE_TYPES.add(Constants.GZIP_FILE);
         SUPPORTED_FILE_TYPES.add(Constants.TAR_FILE);
+        SUPPORTED_FILE_TYPES.add(Constants.PLAIN_TEXT_FILE);
     }
 
     public ProducerContext(String fileName, String fileType, Topic topic, InputStream inputStream, Map<String, Object> producerConfig) {
@@ -109,18 +110,17 @@ public class ProducerContext {
             return true;
         }
 
-        boolean extensionFound = false;
         if (Constants.GZIP_FILE.equals(fileType)) {
             for (String extension : SUPPORTED_EXTENSIONS) {
                 if (fileName.endsWith(extension)) {
-                    extensionFound = true;
-                    break;
+                    return false;
                 }
             }
-        } else {
-            return false;
+            return true;
+        } else if (Constants.PLAIN_TEXT_FILE.equals(fileType) && !fileName.endsWith(".csv")){
+            return true;
         }
 
-        return !extensionFound;
+        return false;
     }
 }
