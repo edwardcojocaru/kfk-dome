@@ -1,7 +1,7 @@
 package com.francetelecom.dome.consumer.standalone;
 
 import com.francetelecom.dome.consumer.ConsumerConnectorManager;
-import com.francetelecom.dome.consumer.configuration.Configurable;
+import com.francetelecom.dome.utils.configuration.Configurable;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
 import org.slf4j.Logger;

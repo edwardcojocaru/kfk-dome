@@ -30,6 +30,10 @@
             <artifactId>commons-compress</artifactId>
             <version>1.6</version>
         </dependency>
+        <dependency>
+            <groupId>com.francetelecom.dome</groupId>
+            <artifactId>kafka-utils</artifactId>
+        </dependency>
     </dependencies>
 
     <profiles>

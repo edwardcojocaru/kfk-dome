@@ -3,7 +3,7 @@ package com.francetelecom.dome;
 import com.francetelecom.dome.beans.Configuration;
 import com.francetelecom.dome.beans.Profile;
 import com.francetelecom.dome.beans.Topic;
-import com.francetelecom.dome.configuration.ConfigurableFactory;
+import com.francetelecom.dome.utils.configuration.ConfigurableFactory;
 import org.junit.Test;
 
 import java.util.List;

@@ -1,11 +1,8 @@
-package com.francetelecom.dome.consumer.configuration;
+package com.francetelecom.dome.utils.configuration;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * User: Eduard.Cojocaru
@@ -43,4 +40,8 @@ public class StreamConfiguration extends AbstractConfiguration {
         return Collections.unmodifiableMap(conf);
     }
 
+    @Override
+    public Set<String> getPropertyNames() {
+        return properties.stringPropertyNames();
+    }
 }

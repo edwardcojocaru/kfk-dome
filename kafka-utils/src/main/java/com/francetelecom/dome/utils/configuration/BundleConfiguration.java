@@ -1,4 +1,4 @@
-package com.francetelecom.dome.consumer.configuration;
+package com.francetelecom.dome.utils.configuration;
 
 import java.util.*;
 
@@ -35,5 +35,10 @@ public class BundleConfiguration extends AbstractConfiguration {
         }
 
         return Collections.unmodifiableMap(conf);
+    }
+
+    @Override
+    public Set<String> getPropertyNames() {
+        return bundle.keySet();
     }
 }

@@ -1,6 +1,7 @@
-package com.francetelecom.dome.configuration;
+package com.francetelecom.dome.utils.configuration;
 
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -14,6 +15,10 @@ public interface Configurable {
     String getStringProperty(String key, String defaultValue);
     int getIntProperty(String key);
     int getIntProperty(String key, int defaultValue);
+    boolean getBooleanProperty(String key);
+
+    Properties getProperties();
+    Map<String, Object> getPropertiesAsMap();
     Set<String> getPropertyNames();
     Map<String, Object> getConfigProperties(String baseKey);
 }

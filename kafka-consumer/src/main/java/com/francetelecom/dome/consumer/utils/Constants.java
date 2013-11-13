@@ -15,8 +15,6 @@ public final class Constants {
 
     public static final String CLUSTER_MODE = "clusterMode";
 
-    public static final String CONFIGURATION_FILE_BASE_NAME = "consumer";
-
     public static final String KAFKA_CONFIG_KEY = "KafkaConfig";
 
     public static final String TOPICS = "topics";

@@ -3,7 +3,7 @@ package com.francetelecom.dome;
 import com.francetelecom.dome.beans.Configuration;
 import com.francetelecom.dome.beans.Profile;
 import com.francetelecom.dome.beans.Topic;
-import com.francetelecom.dome.configuration.Configurable;
+import com.francetelecom.dome.utils.configuration.Configurable;
 import com.francetelecom.dome.exception.BadConfigurationException;
 import com.francetelecom.dome.util.Constants;
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ public class ConfigInitializer {
             configuration = new Configuration(getProfiles(liveCapacity), liveCapacity, watchedDirectory, managementPort, producerConfig);
 
         } catch (Exception ex) {
-            LOGGER.error("The configuration file might be wrong.", ex);
+            LOGGER.error("The utils file might be wrong.", ex);
             throw new BadConfigurationException();
         }
 

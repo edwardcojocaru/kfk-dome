@@ -1,6 +1,6 @@
 package com.francetelecom.dome.consumer;
 
-import com.francetelecom.dome.consumer.configuration.Configurable;
+import com.francetelecom.dome.utils.configuration.Configurable;
 import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import kafka.javaapi.consumer.ConsumerConnector;

@@ -1,4 +1,4 @@
-package com.francetelecom.dome.configuration;
+package com.francetelecom.dome.utils.configuration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,6 +37,12 @@ public abstract class AbstractConfiguration implements Configurable {
         }
     }
 
+    @Override
+    public boolean getBooleanProperty(String key) {
+        return Boolean.parseBoolean(getStringProperty(key));
+    }
+
+    @Override
     public Map<String, Object> getConfigProperties(String baseKey) {
         Map<String, Object> config = new HashMap<>();
 
@@ -49,5 +55,4 @@ public abstract class AbstractConfiguration implements Configurable {
 
         return config;
     }
-
 }

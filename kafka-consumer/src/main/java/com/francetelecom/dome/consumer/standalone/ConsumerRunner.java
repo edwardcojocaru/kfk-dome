@@ -1,7 +1,7 @@
 package com.francetelecom.dome.consumer.standalone;
 
-import com.francetelecom.dome.consumer.configuration.Configurable;
-import com.francetelecom.dome.consumer.configuration.ConfigurableFactory;
+import com.francetelecom.dome.utils.configuration.Configurable;
+import com.francetelecom.dome.utils.configuration.ConfigurableFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

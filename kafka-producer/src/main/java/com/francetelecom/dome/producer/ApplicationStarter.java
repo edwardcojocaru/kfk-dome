@@ -3,7 +3,7 @@ package com.francetelecom.dome.producer;
 import com.francetelecom.dome.ConfigInitializer;
 import com.francetelecom.dome.beans.Configuration;
 import com.francetelecom.dome.beans.Profile;
-import com.francetelecom.dome.configuration.ConfigurableFactory;
+import com.francetelecom.dome.utils.configuration.ConfigurableFactory;
 import com.francetelecom.dome.mbean.ProducerApplication;
 import com.francetelecom.dome.producer.remote.PortListener;
 import com.francetelecom.dome.producer.watcher.DirectoryWatcherManager;
@@ -57,7 +57,7 @@ public class ApplicationStarter {
     }
 
     private void start(String configurationPath) throws IOException {
-        LOGGER.info("Getting configuration...");
+        LOGGER.info("Getting utils...");
         this.configuration = new ConfigInitializer(ConfigurableFactory.getConfigurable(configurationPath)).getConfiguration();
         this.producerRunner = new ProducerRunner(this.configuration.getLiveCapacity());
 

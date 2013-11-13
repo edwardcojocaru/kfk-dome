@@ -1,15 +1,16 @@
 package com.francetelecom.dome.consumer.storm;
 
+import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
-import com.francetelecom.dome.consumer.configuration.Configurable;
-import com.francetelecom.dome.consumer.configuration.ConfigurableFactory;
+import com.francetelecom.dome.utils.configuration.Configurable;
+import com.francetelecom.dome.utils.configuration.ConfigurableFactory;
 import com.francetelecom.dome.consumer.utils.Constants;
+import com.francetelecom.dome.consumer.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -55,25 +56,24 @@ public class StormTopology {
             builder.setBolt(boltId, new SimpleBolt()).shuffleGrouping(spoutId);
         }
 
-        final Map<String, Object> stormConfiguration = getStormConfiguration(configurable);
+        final Map<String, Object> stormConfiguration = Utils.getStormConfiguration(configurable);
         if (configurable.getBooleanProperty(Constants.CLUSTER_MODE)) {
             LOGGER.info("Starting topology in cluster mode.");
             StormSubmitter.submitTopology("kafkaConsumer", stormConfiguration, builder.createTopology());
         } else {
             LOGGER.info("Starting topology in local mode.");
+
+            Config config = new Config();
+            config.setDebug(true);
+            config.setNumWorkers(2);
+            config.putAll(stormConfiguration);
+
             LocalCluster cluster = new LocalCluster();
-            cluster.submitTopology("kafkaConsumer", stormConfiguration, builder.createTopology());
+            cluster.submitTopology("kafkaConsumer", config, builder.createTopology());
         }
     }
 
-    private static Map<String, Object> getStormConfiguration(Configurable configurable) {
-        final Map<String, Object> stormConf = new HashMap<>();
-        stormConf.put(Constants.KAFKA_CONFIG_KEY, configurable.getPropertiesAsMap());
 
-        LOGGER.debug("Storm config: {}", stormConf);
-
-        return stormConf;
-    }
 
 
 }
