@@ -1,6 +1,6 @@
 package com.edw.kafka.consumer.utils;
 
-import com.francetelecom.dome.consumer.ConsumerConnectorManager;
+import com.edw.kafka.consumer.ConsumerConnectorManager;
 import com.edw.kafka.consumer.exception.ConfigurationException;
 import com.edw.kafka.consumer.sync.ImportanceSelector;
 import kafka.consumer.KafkaStream;

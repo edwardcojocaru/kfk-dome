@@ -1,12 +1,13 @@
 package com.edw.kafka.producer.producer;
 
+import com.edw.kafka.producer.ConfigInitializer;
 import com.edw.kafka.producer.beans.Configuration;
 import com.edw.kafka.producer.beans.Profile;
-import com.edw.kafka.utils.configuration.ConfigurableFactory;
 import com.edw.kafka.producer.mbean.ProducerApplication;
 import com.edw.kafka.producer.producer.remote.PortListener;
 import com.edw.kafka.producer.producer.watcher.DirectoryWatcherManager;
 import com.edw.kafka.producer.util.Utils;
+import com.edw.kafka.utils.configuration.ConfigurableFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

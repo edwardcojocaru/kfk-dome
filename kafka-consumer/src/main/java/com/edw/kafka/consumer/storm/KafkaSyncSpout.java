@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
-import static com.francetelecom.dome.utils.Constants.ONE_HOUR_IN_SECONDS;
+import static com.edw.kafka.utils.Constants.ONE_HOUR_IN_SECONDS;
 
 /**
  * User: eduard.cojocaru

@@ -5,6 +5,7 @@ import com.edw.kafka.producer.beans.Profile;
 import com.edw.kafka.producer.beans.Topic;
 import com.edw.kafka.producer.exception.BadConfigurationException;
 import com.edw.kafka.producer.util.Constants;
+import com.edw.kafka.utils.configuration.Configurable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

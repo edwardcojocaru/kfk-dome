@@ -1,6 +1,6 @@
 package com.edw.kafka.utils.configuration;
 
-import com.francetelecom.dome.utils.Constants;
+import com.edw.kafka.utils.Constants;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,7 +1,7 @@
 package com.edw.kafka.consumer.sync;
 
 import au.com.bytecode.opencsv.CSVParser;
-import com.francetelecom.dome.utils.Constants;
+import com.edw.kafka.utils.Constants;
 
 import java.io.IOException;
 

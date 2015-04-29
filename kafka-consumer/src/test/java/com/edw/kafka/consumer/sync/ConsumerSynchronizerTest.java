@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import static com.francetelecom.dome.utils.Constants.ONE_HOUR_IN_SECONDS;
+import static com.edw.kafka.utils.Constants.ONE_HOUR_IN_SECONDS;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

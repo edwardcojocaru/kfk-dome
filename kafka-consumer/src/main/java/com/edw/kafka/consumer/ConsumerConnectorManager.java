@@ -1,5 +1,6 @@
 package com.edw.kafka.consumer;
 
+import com.edw.kafka.utils.configuration.Configurable;
 import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import kafka.javaapi.consumer.ConsumerConnector;

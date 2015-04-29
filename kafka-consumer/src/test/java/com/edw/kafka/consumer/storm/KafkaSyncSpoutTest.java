@@ -85,7 +85,7 @@ public class KafkaSyncSpoutTest {
 
         kafkaSyncSpout.open(configurationMap, topologyContext, collector);
 
-        verifyNew(ConsumerSynchronizer.class).withArguments((double) com.francetelecom.dome.utils.Constants.ONE_HOUR_IN_SECONDS);
+        verifyNew(ConsumerSynchronizer.class).withArguments((double) com.edw.kafka.utils.Constants.ONE_HOUR_IN_SECONDS);
         verifyNew(ConsumerManager.class).withArguments(any(Collection.class), any(ConsumerFactory.class));
 
         verify(consumerSynchronizer).addStreamQueue(argThat(new ArgumentMatcher<QueueHolder>() {

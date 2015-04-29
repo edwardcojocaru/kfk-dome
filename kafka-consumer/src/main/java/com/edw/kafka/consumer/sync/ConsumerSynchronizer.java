@@ -1,6 +1,6 @@
 package com.edw.kafka.consumer.sync;
 
-import com.francetelecom.dome.utils.Constants;
+import com.edw.kafka.utils.Constants;
 import com.edw.kafka.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
