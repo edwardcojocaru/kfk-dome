@@ -25,7 +25,7 @@
             <version>${storm.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.francetelecom.dome</groupId>
+            <groupId>com.edw.karfa</groupId>
             <artifactId>kafka-utils</artifactId>
         </dependency>
 

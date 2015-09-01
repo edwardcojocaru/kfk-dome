@@ -51,7 +51,7 @@ public class ApplicationStarter {
         applicationStarter.start(configurationPath);
 
         MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
-        ObjectName objectName = new ObjectName("com.francetelecom.dome.producer:type=ProducerApplication");
+        ObjectName objectName = new ObjectName("com.edw.kafka.producer:type=ProducerApplication");
         final ProducerApplication producerApplication = new ProducerApplication(applicationStarter);
         mBeanServer.registerMBean(producerApplication, objectName);
     }
