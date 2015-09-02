@@ -6,6 +6,7 @@ package com.edw.kafka.utils;
  */
 public final class Utils {
 
+    
     private static final long CHECK_INTERVAL_IN_MINUTES = 10;
     private static final long SECOND_MILLIS = 1000;
     private static final long MINUTE_MILLIS = SECOND_MILLIS * 60;
